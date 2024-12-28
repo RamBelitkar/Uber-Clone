@@ -1,7 +1,7 @@
 import express from 'express'
 import {body} from 'express-validator'
-import { getProfile, loginUser, registerUser } from '../controllers/user-controllers.js'
-import { authmiddleware } from '../middleware/auth-middleware.js'
+import { getProfile, loginUser, logoutUser, registerUser } from '../controllers/user-controllers.js'
+import {  authmiddlewareUser } from '../middleware/auth-middleware.js'
 const routes=express.Router()
 
 routes.post('/register',[
@@ -17,7 +17,8 @@ routes.post('/login',[
 loginUser
 )
 
-routes.get('/profile',authmiddleware,getProfile)
+routes.get('/profile',authmiddlewareUser,getProfile)
+routes.get('/logout',authmiddlewareUser,logoutUser)
 
 
 export {routes}

@@ -1,7 +1,7 @@
 import { userModel } from "../models/user-model.js";
 import { asyncHandler } from "../utils/Asynchandler.js";
 import { validationResult } from "express-validator";
-
+import { blackListModel } from "../models/blacklistToken-model.js";
 
 //registering the user
 export const registerUser=asyncHandler(async (req,res) => {
@@ -41,7 +41,14 @@ export const registerUser=asyncHandler(async (req,res) => {
         password
     })
     const token=newUser.generateAuthToken()
-    
+
+    const options={
+        httpOnly:true,
+        secure:true
+    }
+
+
+    res.cookie("usertoken",token,options)
     if(newUser){
         return res.status(200)
             .json({
@@ -82,7 +89,7 @@ export const loginUser=asyncHandler(async (req,res) => {
         }
 
         const token=user.generateAuthToken()
-
+        res.cookie("token",token)
         return res.status(200)
         .json({
             message:"Login successfully",
@@ -97,5 +104,20 @@ export const getProfile=asyncHandler(async (req,res) => {
     return res.status(200).json({
         message:"User found",
         user:user
+    })
+})
+
+//Logs out the user and blacklists the token so that no malpractices should occur
+export const logoutUser=asyncHandler(async (req,res) => {
+    const token=req.cookies.token || req.headers.authorization.split(' ')[1]
+    await blackListModel.create({token:token})
+    const options={
+        httpOnly:true,
+        secure:true
+    }
+    res.clearCookie('token',options)
+    res.status(200)
+    .json({
+        message:"Logout successfully done"
     })
 })

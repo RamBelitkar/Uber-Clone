@@ -1,8 +1,8 @@
-import mongoose, { Mongoose } from 'mongoose'
+import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
-const CaptainSchema=new mongoose.schema({
+const CaptainSchema=mongoose.Schema({
     fullname:{
         firstname:{
             type:String,
@@ -23,7 +23,8 @@ const CaptainSchema=new mongoose.schema({
     password:{
         type:String,
         required:true,
-        minlength:[3,'Password should contain 3 or more characters']
+        minlength:[3,'Password should contain 3 or more characters'],
+        select:false
     },
     socketId:{
         type:String
@@ -31,11 +32,12 @@ const CaptainSchema=new mongoose.schema({
     vehicle:{
         color:{
             type:String,
-            required:true
+            required:true,
+            minlength:[3,'color should contain 3 or more characters']
         },
         plate:{
             type:String,
-            required:true
+            required:true,minlength:[3,'Plate should contain 3 or more characters']
         },
         capacity:{
             type:Number,
@@ -44,7 +46,7 @@ const CaptainSchema=new mongoose.schema({
         },
         vehicleType:{
             type:String,
-            enum:['motorcycle','car','auto'],
+            enum:['Motorcycle','Car','Auto'],
             required:true
         }
 
@@ -57,20 +59,20 @@ const CaptainSchema=new mongoose.schema({
 
 })
 CaptainSchema.methods.generateAuthToken=function(){
-    const token = jwt.sign({_id:this._id},process.env.TOKEN_SECRET,{expiresIn:"12h"})
+    const token = jwt.sign({_id:this._id},process.env.TOKEN_SECRET,{expiresIn:"24h"})
     return token
 }
-CaptainSchema.pre('save',async function hashPass(next) {
-  //This refers to current password 
-    //if not modified then go to next function
+//This refers to current password 
+//if not modified then go to next function
+CaptainSchema.pre('save',async function(next) {
   if(!this.isModified('password')) return next()
     
     const hashedPass=await bcrypt.hash(this.password,12);
-    this.password=hashPass
+    this.password=hashedPass
     next()
 })
 
-CaptainModel.methods.checkPassword=async function (password) {
+CaptainSchema.methods.checkPassword=async function (password) {
     return await bcrypt.compare(password,this.password)
 }
 
