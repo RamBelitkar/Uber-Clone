@@ -1,10 +1,6 @@
-Here’s the updated `README.md` with the added login route:
-
----
-
 # Uber Project Backend
 
-This repository contains the backend implementation for the Uber Project. The project is designed to handle various functionalities such as user registration, authentication, and more.
+This repository contains the backend implementation for the Uber Project. The project is designed to handle various functionalities such as user and captain registration, authentication, and more.
 
 ## Installation
 
@@ -158,22 +154,132 @@ Logs in an existing user by verifying their email and password.
   }
   ```
 
-**Notes**:
-- Ensure the user exists in the database.
-- The response includes a JWT token for authenticated sessions.
+---
+
+### **3. Register Captain**
+
+**Endpoint**:  
+`POST /captain/register`
+
+**Description**:  
+Registers a new captain in the system. Similar to the user registration process but also includes vehicle details.
+
+**Request Body**:
+```json
+{
+  "fullname": {
+    "firstname": "Jane",
+    "lastname": "Smith"
+  },
+  "email": "janesmith@example.com",
+  "password": "yourpassword",
+  "vehicle": {
+    "color": "Red",
+    "plate": "ABC-1234",
+    "capacity": 4,
+    "vehicleType": "Car"
+  }
+}
+```
+
+**Validation**:
+- All validations for `fullname`, `email`, and `password` are the same as for users.
+- `vehicle.capacity`: Must be an integer.
+- `vehicle.vehicleType`: Must be a valid string.
+
+**Response**:
+
+- **Success** (`201 Created`):
+  ```json
+  {
+    "message": "New captain registered",
+    "newCaptain": {
+      "fullname": {
+        "firstname": "Jane",
+        "lastname": "Smith"
+      },
+      "email": "janesmith@example.com",
+      "vehicle": {
+        "color": "Red",
+        "plate": "ABC-1234",
+        "capacity": 4,
+        "vehicleType": "Car"
+      }
+    },
+    "token": "your-jwt-token"
+  }
+  ```
+
+- **Validation Error** (`400 Bad Request`):
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "Invalid vehicleType",
+        "param": "vehicle.vehicleType",
+        "location": "body"
+      }
+    ]
+  }
+  ```
 
 ---
 
-### **3. Get User Profile**
+### **4. Login Captain**
 
 **Endpoint**:  
-`GET /user/profile`
+`POST /captain/login`
 
 **Description**:  
-Fetches the profile details of the currently authenticated user.
+Logs in an existing captain using their email and password. The process is the same as the user login.
 
-**Authentication Middleware**:  
-This endpoint requires the user to be authenticated via JWT. The token must be included in the `Authorization` header as a Bearer token.
+**Request Body**:
+```json
+{
+  "email": "janesmith@example.com",
+  "password": "yourpassword"
+}
+```
+
+**Response**:
+
+- **Success** (`200 OK`):
+  ```json
+  {
+    "message": "Login successful",
+    "token": "your-jwt-token"
+  }
+  ```
+
+- **Validation Error** (`400 Bad Request`):
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "Invalid email",
+        "param": "email",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+
+- **Invalid Credentials** (`401 Unauthorized`):
+  ```json
+  {
+    "message": "Invalid email or password"
+  }
+  ```
+
+---
+
+### **5. Logout (User and Captain)**
+
+**Endpoint**:  
+`POST /logout`
+
+**Description**:  
+Logs out the currently authenticated user or captain by blacklisting their token.
 
 **Request Header**:
 ```json
@@ -182,22 +288,12 @@ This endpoint requires the user to be authenticated via JWT. The token must be i
 }
 ```
 
-**Middleware Logic**:  
-The middleware verifies the provided JWT token and extracts the user information from the decoded payload. If the token is valid, it proceeds to the handler, which fetches the user's profile information. If the token is invalid or expired, it returns a `401 Unauthorized` error.
-
 **Response**:
 
 - **Success** (`200 OK`):
   ```json
   {
-    "message": "Profile fetched successfully",
-    "user": {
-      "fullname": {
-        "firstname": "John",
-        "lastname": "Doe"
-      },
-      "email": "johndoe@example.com"
-    }
+    "message": "Logout successful"
   }
   ```
 
@@ -209,8 +305,7 @@ The middleware verifies the provided JWT token and extracts the user information
   ```
 
 **Notes**:
-- The JWT token in the `Authorization` header is required to fetch the user profile.
-- The middleware ensures that only authenticated users can access this endpoint.
+- The JWT token is invalidated by adding it to the blacklist collection.
 
 ---
 
@@ -222,30 +317,5 @@ The middleware verifies the provided JWT token and extracts the user information
 - **Mongoose**: ODM library for MongoDB.
 - **express-validator**: Middleware for request validation.
 - **jsonwebtoken**: For token-based authentication.
-
----
-
-## Contributing
-
-1. Fork the repository.
-2. Create a feature branch:
-   ```bash
-   git checkout -b feature-name
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m "Add feature name"
-   ```
-4. Push to the branch:
-   ```bash
-   git push origin feature-name
-   ```
-5. Create a pull request.
-
----
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
