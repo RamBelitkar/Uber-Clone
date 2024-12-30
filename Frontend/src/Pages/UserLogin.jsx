@@ -1,20 +1,34 @@
-import React,{useState} from 'react';
-import { Link } from 'react-router-dom';
+import React,{useState,useCallback,useContext} from 'react';
+import { useNavigate,Link } from 'react-router-dom';
 import Header from '../Components/Header';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
+
+import axios from 'axios';
+import { UserDataContext } from '../Context/UserContext';
+
+
+
 
 function UserLogin() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [userData,setUserData]=useState({})
-    const handleSubmit=(e)=>{
+    const nav=useNavigate()
+      const {user,setUser}=useContext(UserDataContext)
+
+    const handleSubmit=async(e)=>{
         e.preventDefault()
-        setUserData({
-            email:email,
-            password:password
-        })
-        console.log(userData);
+       const existUser=({
+        email:email,
+        password:password
+       })
+        const res=await axios.post(`${import.meta.env.VITE_BASE_URL}/user/login`,existUser)
+        if(res.status===200){
+          const data=res.data
+          console.log(data.message);
+          localStorage.setItem('usertoken',data.token)
+          nav('/home')
+        }
     }
     
   return (

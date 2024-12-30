@@ -1,8 +1,8 @@
 import React from 'react';
-import ScrollAnimation from '../Components/ScrollAnimation';
-import { Link } from 'react-router-dom'; // Import for navigation links
-import Testimonials from '../Components/Testimonials.jsx';
-const HomePage = () => (
+import { Link } from 'react-router-dom';
+import {Testimonials,ScrollAnimation} from '../Components'
+
+const LandingPage = () => (
   <div>
     {/* Greeting message section */}
     <div className="h-[550px] grid place-content-center text-center">
@@ -12,7 +12,7 @@ const HomePage = () => (
       <img
         src="https://images.ctfassets.net/zmrtlfup12q3/534bZp7Kjlzv0vEW0uMzzs/f223cbb86e08904df660f46ebdc31d42/Uber.jpg?fm=jpg&q=85&w=1920&fit=fill&fl=progressive&f=center&r=" // Uber logo URL
         alt="Uber Logo"
-        className="h-40" // Set the image height as needed
+        className="h-60"
       />
     </div>
     </div>
@@ -58,4 +58,4 @@ const HomePage = () => (
   </div>
 );
 
-export default HomePage;
+export default LandingPage;

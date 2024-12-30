@@ -1,20 +1,29 @@
-import React,{useState} from 'react';
-import { Link } from 'react-router-dom';
+import React,{useContext, useState} from 'react';
+import { Link , useNavigate} from 'react-router-dom';
 import Header from '../Components/Header';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
-
+import { CaptainDataContext } from '../Context/CaptainContext';
+import axios from 'axios';
 export function CapLogin() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [capData,setCapData]=useState({})
-    const handleSubmit=(e)=>{
+    const [captain,setCaptain]=useContext(CaptainDataContext)
+    const nav=useNavigate()
+    const handleSubmit=async(e)=>{
         e.preventDefault()
-        setCapData({
-            email:email,
-            password:password
-        })
-        console.log(capData);
+        const existUser=({
+          email:email,
+          password:password
+         })
+          const res=await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/login`,existUser)
+          if(res.status===200){
+            const data=res.data
+            console.log(data.message);
+            localStorage.setItem('captoken',data.token)
+            nav('/caphome')
+          }
+      
     }
     
   return (
@@ -22,7 +31,9 @@ export function CapLogin() {
     <Header/>
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
       <form className="max-w-sm w-full p-6" onSubmit={handleSubmit}>
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3 text-center">Welcome Back!</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3 text-center">Welcome Back! Cap
+         About Time
+        </h2>
         
         <div className="mb-3">
           <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
