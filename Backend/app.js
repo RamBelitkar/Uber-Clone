@@ -11,7 +11,9 @@ import Captainroute from './src/routes/captain-routes.js'
 
 const userRoutes=routes
 const app=express()
-app.use(cors())
+app.use(cors({
+    origin: 'http://localhost:5173', // Allow requests from this URL
+  }));
 app.use(express.json())
 app.use(cookieparser())
 app.use('/user',userRoutes)

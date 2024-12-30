@@ -50,7 +50,7 @@ export const registerUser=asyncHandler(async (req,res) => {
 
     res.cookie("usertoken",token,options)
     if(newUser){
-        return res.status(200)
+        return res.status(201)
             .json({
                 message:"New user created",
                 Newuser:newUser,

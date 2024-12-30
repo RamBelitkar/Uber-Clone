@@ -17,7 +17,7 @@ export const authmiddlewareUser=async (req,res,next) => {
         if(isTokenBlacklisted){
             res.status(404).
             json({
-                message:"Token not invalid"
+                message:"Token not valid"
             })
         }
         const verifyToken=jwt.verify(token,process.env.TOKEN_SECRET)

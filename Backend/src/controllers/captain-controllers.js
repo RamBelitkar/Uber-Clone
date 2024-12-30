@@ -45,6 +45,7 @@ export const registerCaptain=asyncHandler(async (req,res) => {
             vehicleType:vehicle.vehicleType
         }
     })
+    const token=newCap.generateAuthToken()
     const options={
         httpOnly:true,
         secure:true
@@ -53,7 +54,8 @@ export const registerCaptain=asyncHandler(async (req,res) => {
     res.cookie("token",token,options)
     return res.status(201).json({
         message:"Captain created",
-        newCap
+        newCap,
+        token:token
     })
 
 
