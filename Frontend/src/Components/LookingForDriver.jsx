@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Car, Bike, Truck, ChevronLeft, Star, Users, Clock } from 'lucide-react';
 import VehicleDetails from './VehicleDetails.jsx';
+import WaitingScreen from './WaitingScreen.jsx';
+import ConfirmRide from './ConfirmRide.jsx';
 const vehicleOptions = {
   Auto: [
     { id: 1, name: 'Auto Type 1', fare: 100, estimatedTime: 25, icon: Car },
@@ -28,11 +30,53 @@ const vehicleOptions = {
 function LookingForDriver({ onBack }) {
   const [selectedVehicleType, setSelectedVehicleType] = useState('');
   const [selectedVehicleDetails, setSelectedVehicleDetails] = useState(null);
+    const [isWaiting, setIsWaiting]=useState(false)
+  const [bookingStage,setBookingStage]=useState('selection')
+
+
+
 
   const handleVehicleSelectType = (type) => {
     setSelectedVehicleType(type);
     setSelectedVehicleDetails(null);
   };
+const handleConfirmVehicle=(vehicle)=>{
+    setIsWaiting(true)
+    setTimeout(()=>{
+        setBookingStage('confirm')
+    },2000)
+}
+const handleConfirmRide=()=>{
+    setBookingStage('payment')
+}
+
+const handleCancelRide = () => {
+    setBookingStage('selection');
+    setSelectedVehicleDetails(null);
+  };
+
+const handlePaymentCompleted=()=>{
+    alert('Your ride is on the way')
+
+    setBookingStage('selection')
+    setSelectedVehicleDetails(null);
+    setSelectedVehicleType('');
+}
+
+
+if(bookingStage==='Waiting')
+{
+    return <WaitingScreen vehicleName={selectedVehicleDetails.name}/>
+}
+
+if(bookingStage==='confirm'){
+    return(
+        <ConfirmRide
+        vehicle={selectedVehicleDetails}
+        onConfirm={handleConfirmRide}
+        onCancel={handleCancelRide}/>
+    )
+}//If user confirms the ride then vehicle details should be send
 
   const handleVehicleDetailSelect = (vehicle) => {
     setSelectedVehicleDetails(vehicle);
@@ -44,6 +88,7 @@ function LookingForDriver({ onBack }) {
         <VehicleDetails 
           vehicle={selectedVehicleDetails} 
           onBack={() => setSelectedVehicleDetails(null)} 
+          onConfirm={handleConfirmVehicle}
         />
       ) : (
         <>

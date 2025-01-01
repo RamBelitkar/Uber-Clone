@@ -7,6 +7,9 @@ import UserHomePage from "./UserHomePage.jsx";
 import CaptainHome from "./CaptainHome.jsx";
 import UserLogout from "./UserLogout.jsx";
 import CaptainLogout from "./CaptainLogout.jsx";
+import ProtectedWrapper from "./ProtectedWraper.jsx";
+import CaptainProtected from "./CaptainProtected.jsx";
+import CaptainRiding from "./CaptainRiding.jsx";
 export {
     LandingPage,
     UserLogin,
@@ -16,5 +19,8 @@ export {
     UserHomePage,
     UserLogout,
     CaptainHome,
-    CaptainLogout
+    CaptainProtected,
+    ProtectedWrapper,
+    CaptainLogout,
+    CaptainRiding
 }

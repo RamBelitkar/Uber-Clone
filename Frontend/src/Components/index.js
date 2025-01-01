@@ -1,20 +1,20 @@
 import ScrollAnimation from "./ScrollAnimation";
-import ProtectedWraper from "./ProtectedWraper";
 import Header from "./Header";
 import Testimonials from "./Testimonials";
-import CaptainProtected from "./CaptainProtected";
+import DriverAcceptRide from "./DriverAcceptRide";
 import VehicleDetails from "./VehicleDetails";
 import LookingForDriver from "./LookingForDriver";
 import LocationInput from "./LocationInput";
 import RecentTrips from "./RecentTrips";
+import ConfirmRide  from "./ConfirmRide";
 export {
     Testimonials,
     VehicleDetails,
     Header,
-    CaptainProtected,
+    DriverAcceptRide,
     ScrollAnimation,
-    ProtectedWraper,
     LookingForDriver,
     LocationInput,
-    RecentTrips
+    RecentTrips,
+    ConfirmRide
 }

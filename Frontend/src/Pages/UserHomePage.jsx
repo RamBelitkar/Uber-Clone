@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import { Search,  Car, Bike, Truck, Clock, Gift, ArrowRight,MapPin,ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,7 +28,11 @@ export default function UserHomePage() {
   const [pickup, setPickup] = useState('');
   const [drop, setDrop] = useState('');
   const [showDriverSearch, setShowDriverSearch] = useState(false);
-
+  const handleBack = () => {
+    if (showDriverSearch) {
+      setShowDriverSearch(null); // Reset vehicle selection
+    }
+  };
   return (
     <div className="min-h-screen bg-white">
       <header className="bg-black text-white p-4 flex justify-between items-center">
@@ -40,7 +42,7 @@ export default function UserHomePage() {
       <main className="p-4 max-w-3xl mx-auto">
         {showDriverSearch ? (
           <motion.div key="driver-search">
-            <LookingForDriver pickup={pickup} drop={drop} />
+            <LookingForDriver pickup={pickup} drop={drop} onBack={handleBack}/>
           </motion.div>
         ) : (
           <motion.div key="main-view">

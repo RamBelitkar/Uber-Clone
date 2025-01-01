@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 // import './App.css';
 import { CapLogin, CapSignup,UserLogin, UserSignup,LandingPage, UserLogout, CaptainHome,CaptainLogout, UserHomePage } from './Pages';
-import { CaptainProtected, ProtectedWraper } from './Components';
+// import { CaptainProtected,ProtectedWrapper } from './Pages';
+import { CaptainProtected,ProtectedWrapper,CaptainRiding } from './Pages';
 
 function App() {
  
@@ -16,14 +17,14 @@ function App() {
         <Route path="/capLogin" element={<CapLogin/>} />
         <Route path="/capSignup" element={<CapSignup/>} />
        <Route path='/home' element={
-        <ProtectedWraper>
+        <ProtectedWrapper>
           <UserHomePage/>
-        </ProtectedWraper>
+        </ProtectedWrapper>
         }/>
        <Route path='/user/logout' element={
-        <ProtectedWraper>
+        <ProtectedWrapper>
           <UserLogout/>
-        </ProtectedWraper>
+        </ProtectedWrapper>
         }/>
         <Route path='/caphome' element={
           <CaptainProtected>
@@ -31,9 +32,14 @@ function App() {
           </CaptainProtected>
           }/>
         <Route path='/capLogout' element={
-          <CaptainProtected>
-            <CaptainLogout/>
-          </CaptainProtected>
+        <CaptainProtected>
+          <CaptainLogout/>
+        </CaptainProtected>
+          }/>
+          <Route path='/captainRiding' element={
+            <CaptainProtected>
+              <CaptainRiding/>
+            </CaptainProtected>
           }/>
 
       </Routes>
