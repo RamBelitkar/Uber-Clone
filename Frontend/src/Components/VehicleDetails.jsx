@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, Star, Users, Clock } from 'lucide-react';
 
-const VehicleDetails = ({ vehicle, onBack }) => {
+function VehicleDetails({ vehicle, onBack }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -57,7 +57,7 @@ const VehicleDetails = ({ vehicle, onBack }) => {
       </div>
     </motion.div>
   );
-};
+}
 
 export default VehicleDetails;
 
