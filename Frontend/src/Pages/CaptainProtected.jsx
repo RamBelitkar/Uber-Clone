@@ -8,7 +8,7 @@ function CaptainProtected({children}) {
 const token=localStorage.getItem('captoken')    
     const nav=useNavigate()
     const [loading,setLoading]=useState(true)
-    const [captain,setCaptain]=useContext(CaptainDataContext)
+    const {captain,setCaptain}=useContext(CaptainDataContext)
 
    useEffect(() => {
     if(!token){
@@ -23,6 +23,7 @@ const token=localStorage.getItem('captoken')
       })
       .then((response) => {
         if (response.status === 200) {
+          console.log(response.data.cap)
           setCaptain(response.data.cap);
           setLoading(false);
         }

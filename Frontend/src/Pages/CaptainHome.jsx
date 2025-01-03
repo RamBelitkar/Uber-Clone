@@ -1,8 +1,10 @@
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import { motion } from 'framer-motion';
 import { MapPin, Clock, DollarSign, User, CheckCircle } from 'lucide-react';
 import { DriverAcceptRide, Header } from '../Components';
-
+import { useContext } from 'react';
+import { CaptainContext, CaptainDataContext } from '../Context/CaptainContext';
+import { SocketContext } from '../Context/SocketContext';
 function CaptainHome() {
     const mockRideRequests = [
         { id: 1, pickup: "Central Park", dropoff: "Times Square", estimatedTime: 15, fare: 25, passengerName: "John Doe" },
@@ -17,10 +19,23 @@ function CaptainHome() {
       setAcceptedRides([...acceptedRides, acceptedRide]);
       setRideRequests(rideRequests.filter(ride => ride.id !== rideId));
     };
+
+const {captain}=useContext(CaptainDataContext)
+const {socket}=useContext(SocketContext)
+
+useEffect(()=>{
+  console.log('sending captian',`${captain}`)
+socket.emit('join',{userId:captain._id,role:"captain"})
+})
+
+
+
+
+
     return (
         <>
         <Header/>
-        <DriverAcceptRide/>
+        {/* <DriverAcceptRide/> */}
        <div className="p-4 max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Available Ride Requests</h1>
       

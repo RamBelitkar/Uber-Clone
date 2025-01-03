@@ -13,7 +13,7 @@ export const CaptainContext=({children})=>{
     })
 
     return(
-        <CaptainDataContext.Provider value={[captain,setCaptain]}>
+        <CaptainDataContext.Provider value={{captain,setCaptain}}>
             {children}
         </CaptainDataContext.Provider>
     )

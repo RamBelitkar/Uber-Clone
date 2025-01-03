@@ -7,6 +7,7 @@ import LookingForDriver from "./LookingForDriver";
 import LocationInput from "./LocationInput";
 import RecentTrips from "./RecentTrips";
 import ConfirmRide  from "./ConfirmRide";
+import { OffersSection } from "./OfferSection";
 export {
     Testimonials,
     VehicleDetails,
@@ -16,5 +17,6 @@ export {
     LookingForDriver,
     LocationInput,
     RecentTrips,
+    OffersSection,
     ConfirmRide
 }

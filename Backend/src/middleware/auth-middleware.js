@@ -68,7 +68,7 @@ export const authmiddlewareCap=async (req,res,next) => {
             })
         }
     
-        const captain=await CaptainModel.findById(verifyToken._id).select('-_id -__v')
+        const captain=await CaptainModel.findById(verifyToken._id).select('-__v')
         req.captain=captain
         next()
     } catch (error) {

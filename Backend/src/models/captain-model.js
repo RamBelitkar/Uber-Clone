@@ -55,6 +55,14 @@ const CaptainSchema=mongoose.Schema({
         type:String,
         enum:['inactive','active'],
         default:'inactive'
+    },
+    location:{
+        lat:{
+            type:Number
+        },
+        lng:{
+            type:Number
+        }
     }
 
 })
