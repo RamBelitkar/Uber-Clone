@@ -21,7 +21,7 @@ export const authmiddlewareUser=async (req,res,next) => {
             })
         }
         const verifyToken=jwt.verify(token,process.env.TOKEN_SECRET)
-        const user=await userModel.findById(verifyToken._id).select('-_id -__v')
+        const user=await userModel.findById(verifyToken._id).select('-__v')
         if(!user){
             return res.status(400).json({
                 message:"User not found"

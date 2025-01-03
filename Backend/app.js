@@ -7,6 +7,10 @@ import cors from 'cors'
 import cookieparser from 'cookie-parser'
 import { routes } from './src/routes/user-routes.js'
 import Captainroute from './src/routes/captain-routes.js'
+import maproutes from './src/routes/maps-routes.js'
+import rideRoute from './src/routes/ride-routes.js' 
+
+
 
 
 const userRoutes=routes
@@ -18,6 +22,7 @@ app.use(express.json())
 app.use(cookieparser())
 app.use('/user',userRoutes)
 app.use('/captain',Captainroute)
-
+app.use('/maps',maproutes)
+app.use('/ride',rideRoute)
 
 export {app} 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, ArrowRight } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
+import VehicleDetails from './VehicleDetails'; // Import VehicleDetails component
 
 function ConfirmRide({ vehicle, onConfirm, onCancel }) {
     return (
@@ -11,6 +12,13 @@ function ConfirmRide({ vehicle, onConfirm, onCancel }) {
         transition={{ duration: 0.3 }}
         className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto"
       >
+        {/* Display VehicleDetails component */}
+        {vehicle && (
+          <VehicleDetails
+            vehicle={vehicle}
+          />
+        )}
+
         <div className="flex items-center justify-center mb-6">
           <CheckCircle className="w-16 h-16 text-green-500" />
         </div>
@@ -24,7 +32,7 @@ function ConfirmRide({ vehicle, onConfirm, onCancel }) {
             transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
             onClick={onConfirm}
           >
-            Proceed to Payment      
+            Confirm Ride     
           </button>
           <button 
             variant="outline"
@@ -36,7 +44,6 @@ function ConfirmRide({ vehicle, onConfirm, onCancel }) {
         </div>
       </motion.div>
     );
-  }
-  
-  export default ConfirmRide;
-  
+}
+
+export default ConfirmRide;
