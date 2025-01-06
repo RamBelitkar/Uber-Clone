@@ -17,7 +17,7 @@ function CapSignup() {
   const [plate, setPlate] = useState('');
   const [capacity, setCapacity] = useState(Number(1));
   const nav=useNavigate()
-  const [captain,setCaptain]=useContext(CaptainDataContext)
+  const {captain,setCaptain}=useContext(CaptainDataContext)
   const handleSubmit =async (e) => {
     e.preventDefault();
     const newCap=({

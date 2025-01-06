@@ -30,8 +30,10 @@ const rideSchema=new mongoose.Schema({
     distance:{
         type:Number
     },//In Km
-    paymentId:{
-        type:String
+    paymentType:{
+        type:String,
+        enum:['cash','online'],
+        default:'online'
     },
     signature:{
         type:String
@@ -41,7 +43,7 @@ const rideSchema=new mongoose.Schema({
     },
     status:{
         type:'String',
-        enum:['pending','accepted','completed','cancelled'],
+        enum:['pending','accepted','completed','cancelled','ongoing'],
         default:'pending'
     },
     otp:{

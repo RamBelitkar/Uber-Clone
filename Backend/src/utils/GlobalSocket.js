@@ -25,7 +25,7 @@ const initializeSocket=(server)=>{
                 })
             }
             else if(role==='captain'){
-                console.log(`Captain is connected ${userId}`);
+                // console.log(`Captain is connected ${userId}`);
                 await CaptainModel.findByIdAndUpdate(userId,{
                     socketId:socket.id
                 })
@@ -35,10 +35,11 @@ const initializeSocket=(server)=>{
 
         socket.on('update-location',async(data)=>{
             const {location,id}=data
-
-            if(!location.lat || !location.lng ){
+                
+            if(!location || !location.lat || !location.lng ){
                 socket.emit('error',{message:"Missing location field"})
             }
+            // console.log(`Captian location ${location.lat} ${location.lng}`);
             await CaptainModel.findByIdAndUpdate(id,{
                 location:{
                 lat:location.lat,
@@ -49,15 +50,15 @@ const initializeSocket=(server)=>{
 
         })
         socket.on('disconnect',()=>{
-            console.log(`Client disconnected: ${socket.id}`);
+            // console.log(`Client disconnected: ${socket.id}`);
         })
     })
     return io
 }
 
-const sendMessage=function(socketId,message){
+const sendMessage=function(socketId,messageObj){
     if(io){
-        io.to(socketId).emit(message)
+        io.to(socketId).emit(messageObj.event,messageObj.data)
     }
     else{
         throw new Error('Socket not Initialized')

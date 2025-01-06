@@ -1,11 +1,11 @@
 import e from "express";
 import { body,query } from "express-validator";
-import { createRide, getFare } from "../controllers/ride-controller.js";
-import { authmiddlewareUser } from "../middleware/auth-middleware.js";
+import { confirmRide, createRide, endRide, getFare, makePayment, startRide } from "../controllers/ride-controller.js";
+import { authmiddlewareCap, authmiddlewareUser } from "../middleware/auth-middleware.js";
 
 const rideRoute=e.Router()
 
-rideRoute.post('/create-ride',
+rideRoute.post('/create',
     authmiddlewareUser,
     [
         body('pickUp').isString().isLength({min:3}),
@@ -23,5 +23,39 @@ rideRoute.post('/getFares',authmiddlewareUser,
     ],
     getFare
 )
+rideRoute.post('/accept',
+    authmiddlewareCap,
+    [
+        body("rideId").isMongoId().withMessage('Invalid Ride id')
+    ],
+    confirmRide
+)
 
+
+rideRoute.post('/start',
+    authmiddlewareCap,
+    [
+        body('rideId').isMongoId().withMessage('Invalid Ride ID'),
+        body('otp').isLength({min:6}).withMessage('Otp length should be 6')
+    ],
+    startRide
+)
+
+
+rideRoute.post('/ended',
+    authmiddlewareCap,
+    [        body('rideId').isMongoId().withMessage('Invalid Ride ID'),
+    ],
+    endRide
+)
+
+
+rideRoute.put('/payment',
+    authmiddlewareUser,
+    [
+        body('paymentType').isIn(['cash','online']).withMessage('Payment should be online or cash'),
+        body('rideId').isMongoId().withMessage('Invalid Ride ID')
+    ],
+    makePayment
+)
 export default rideRoute

@@ -2,17 +2,37 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, Clock, DollarSign, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios"
+
 
 function ConfirmationPopup({ ride, isVisible, onClose }) {
   const [otp, setOtp] = useState('');
   const nav = useNavigate();
-
-  const handleRedirect = () => {
-    if (otp === '1234') { // You can change this OTP validation logic
-      nav('/captainRiding');
-      onClose();
-    } else {
-      alert('Invalid OTP');
+  const token=localStorage.getItem('captoken')
+  const goToRiding = async() => {
+    try{
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/ride/start`,
+        {
+          rideId:ride._id,
+          otp:otp
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if(response.status===200){
+        const ride=response.data.ride
+        const user=ride.User
+        nav('/captainRideStarted',{state:{
+          ride,
+          user
+        }})
+      }
+    }catch(err){
+      console.log(err);
     }
   };
 
@@ -72,7 +92,7 @@ function ConfirmationPopup({ ride, isVisible, onClose }) {
                 onChange={(e) => setOtp(e.target.value)}
               />
               <button
-                onClick={handleRedirect}
+                onClick={goToRiding}
                 className="w-full mt-4 bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
               >
                 Start Ride
@@ -85,21 +105,32 @@ function ConfirmationPopup({ ride, isVisible, onClose }) {
   );
 }
 
-function DriverAcceptRide() {
-  const [isRidePopupVisible, setIsRidePopupVisible] = useState(true);
-  const [isConfirmationPopupVisible, setIsConfirmationPopupVisible] = useState(false);
 
-  const ride = {
-    pickup: "Downtown Mall",
-    dropoff: "Central Park",
-    estimatedTime: 15,
-    fare: 150,
-    passengerName: "John Doe",
-  };
+function DriverAcceptRide({ rideData }) {
+  const [isRidePopupVisible, setIsRidePopupVisible] = useState(!!rideData);
+  const [isConfirmationPopupVisible, setIsConfirmationPopupVisible] = useState(false);
 
   const closeRidePopup = () => setIsRidePopupVisible(false);
 
-  const handleAccept = () => {
+  const handleAccept = async() => {
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/ride/accept`,
+        { rideId: rideData._id },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem('captoken')}` },
+        }
+      );
+      if (response.status === 200) {
+        console.log('Ride Accepted:', response.data);
+        setIsRidePopupVisible(false);
+        setIsConfirmationPopupVisible(true);
+      }
+    } catch (error) {
+      console.error('Error accepting ride:', error);
+    }
+
     setIsRidePopupVisible(false);
     setIsConfirmationPopupVisible(true);
   };
@@ -112,6 +143,12 @@ function DriverAcceptRide() {
   const handleCloseConfirmation = () => {
     setIsConfirmationPopupVisible(false);
   };
+
+  if (!rideData || Object.keys(rideData).length === 0) return null; // Don't render if no ride data.
+  // console.log(rideData.User)
+  const ride = rideData;
+  const user = rideData.User;
+
 
   return (
     <div>
@@ -148,11 +185,11 @@ function DriverAcceptRide() {
                 </div>
                 <div className="flex items-center">
                   <MapPin className="w-5 h-5 mr-2 text-red-500" />
-                  <span>Dropoff: {ride.dropoff}</span>
+                  <span>Destination: {ride.destination}</span>
                 </div>
                 <div className="flex items-center">
                   <Clock className="w-5 h-5 mr-2 text-gray-500" />
-                  <span>Est. Time: {ride.estimatedTime} mins</span>
+                  <span>Duration: {ride.duration} mins</span>
                 </div>
                 <div className="flex items-center">
                   <DollarSign className="w-5 h-5 mr-2 text-green-500" />
@@ -160,7 +197,9 @@ function DriverAcceptRide() {
                 </div>
                 <div className="flex items-center">
                   <User className="w-5 h-5 mr-2 text-gray-500" />
-                  <span>Passenger: {ride.passengerName}</span>
+                  <span>
+                    Passenger: {user.fullname.firstname} {user.fullname.lastname}
+                  </span>
                 </div>
               </div>
               <div className="flex justify-between mt-6">
@@ -190,5 +229,4 @@ function DriverAcceptRide() {
     </div>
   );
 }
-
 export default DriverAcceptRide;

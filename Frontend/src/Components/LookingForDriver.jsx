@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Car, Bike, ChevronLeft } from 'lucide-react';
-import VehicleDetails from './VehicleDetails.jsx';
+import WaitingScreen from './WaitingScreen.jsx';
 import axios from 'axios';
 
 function LookingForDriver({ onBack, pickup, drop }) {
@@ -48,13 +48,7 @@ function LookingForDriver({ onBack, pickup, drop }) {
       pickup,
       drop
     });
-    setBookingStage('confirm');
-  };
-
-  const handleConfirmRide = (vehicle) => {
-    // Here you can add logic to process the confirmed ride
-    console.log('Ride confirmed:', vehicle);
-    setBookingStage('payment');
+    setBookingStage('waiting');
   };
 
   const handleBackToSelection = () => {
@@ -62,12 +56,11 @@ function LookingForDriver({ onBack, pickup, drop }) {
     setSelectedVehicleDetails(null);
   };
 
-  if (bookingStage === 'confirm') {
+  if (bookingStage === 'waiting') {
     return (
-      <VehicleDetails
+      <WaitingScreen
         vehicle={selectedVehicleDetails}
         onBack={handleBackToSelection}
-        onConfirm={handleConfirmRide}
       />
     );
   }
@@ -133,10 +126,9 @@ function LookingForDriver({ onBack, pickup, drop }) {
             <span className="font-semibold">Fare: ₹{fare?.auto}</span>
           </div>
         </motion.button>
-      </motion.div> 
+      </motion.div>
     </div>
   );
 }
 
 export default LookingForDriver;
-

@@ -1,12 +1,16 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Star, Users, Clock } from 'lucide-react';
+import { ChevronLeft, Star, Users, Clock,MapPin } from 'lucide-react';
 import axios from 'axios';
+import { SocketContext, SocketProvider } from '../Context/SocketContext';
+
+import { useNavigate } from 'react-router-dom';
+
 
 function VehicleDetails({ vehicle, onBack, onConfirm }) {
   const token = localStorage.getItem('usertoken');
-  console.log(vehicle);
-
+ 
+  const {socket}=useContext(SocketContext)
   const createRide = useCallback(async () => {
     try {
       const response = await axios.post(
@@ -29,79 +33,117 @@ function VehicleDetails({ vehicle, onBack, onConfirm }) {
     createRide(); // Call the API when confirm is clicked
     onConfirm(vehicle); // Call the onConfirm function passed as prop
   };
+  const captain=vehicle.Captain
+  const nav=useNavigate()
 
+  useEffect(()=>{
+    socket.on('start-ride',()=>{
+      nav('/rideStarted',{state :{
+        vehicle,
+        captain
+      }})
+    })
+
+    return ()=>{
+      socket.off('start-ride')
+    }
+  },[socket,nav,vehicle,captain])
   return (
-    <motion.div
-    initial={{ opacity: 0, y: 50 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: 50 }}
-    transition={{ duration: 0.3 }}
-    className="bg-white rounded-lg overflow-hidden shadow-lg max-w-md mx-auto"
-  >
-    <div className="p-6">
-      <button onClick={onBack} className="mb-4 flex items-center text-gray-600 hover:text-gray-800 transition-colors">
-        <ChevronLeft className="w-5 h-5 mr-1" />
-        Back
-      </button>
-      <div className="bg-gray-100 p-6 mb-4 rounded-lg">
-        <div className="flex items-center justify-center mb-4">
-          {/* Ensure the icon is a valid React component */}
-          {vehicle.icon && React.createElement(vehicle.icon, { className: 'w-16 h-16 text-blue-500' })}
+<motion.div
+  initial={{ opacity: 0, y: 50 }}
+  animate={{ opacity: 1, y: 0 }}
+  exit={{ opacity: 0, y: 50 }}
+  transition={{ duration: 0.3 }}
+  className="bg-white min-h-screen flex flex-col"
+>
+  <div className="p-4 border-b">
+    <button onClick={onBack} className="flex items-center text-gray-600" aria-label="Go back">
+      <ChevronLeft className="w-6 h-6 mr-2" />
+      <span className="text-lg font-semibold">Trip details</span>
+    </button>
+  </div>
+
+  <div className="flex-1 overflow-y-auto">
+    <div className="p-4 space-y-6">
+
+      {/* Captain Details */}
+      <div className="px-6 bg-gray-50 p-4 rounded-lg">
+        <h3 className=" font-semibold mb-1">Your captain</h3>
+        <div className="flex items-center space-x-3">
+          <div>
+            <p className="font-medium mt-1">{`${captain?.fullname?.firstname || 'N/A'} ${captain?.fullname?.lastname || ''}`}</p>
+            <p className="mt-2 text-sm">
+          <span className="font-semibold">PLATE:</span> {captain.vehicle?.plate || 'N/A'}
+        </p>
+          </div>
         </div>
-        <h2 className="text-2xl font-bold mb-2 text-center">{vehicle.name}</h2>
-        <div className="flex items-center justify-center mb-2">
-          <Star className="w-5 h-5 text-yellow-500 mr-1" />
-          <span className="font-medium">4.8</span>
-          <span className="text-gray-500 ml-2">(2.5k reviews)</span>
-        </div>
-        <p className="text-gray-600 text-center">Estimated arrival: {vehicle.estimatedTime} mins</p>
+        <p className="mt-2 text-sm">
+          <span className="font-semibold">OTP:</span> {vehicle?.otp || 'N/A'}
+        </p>
       </div>
-      {/* Display Pickup and Drop Locations */}
-      <div className="bg-gray-100 p-4 mb-4 rounded-lg">
-        <h3 className="font-semibold text-lg">Pickup & Drop</h3>
-        <div className="mt-2">
-          <p className="text-gray-600"><strong>Pickup:</strong> {vehicle.pickup}</p>
-          <p className="text-gray-600"><strong>Drop:</strong> {vehicle.drop}</p>
+
+      {/* Pickup and Drop */}
+      <div className="space-y-4">
+        <div className="flex items-start">
+          <MapPin className="w-5 h-5 text-gray-400 mr-3 mt-1" />
+          <div>
+            <p className="text-sm text-gray-500">Pickup</p>
+            <p className="font-medium">{vehicle.pickup || 'Loading pickup location...'}</p>
+          </div>
+        </div>
+        <div className="flex items-start">
+          <MapPin className="w-5 h-5 text-gray-400 mr-3 mt-1" />
+          <div>
+            <p className="text-sm text-gray-500">Drop-off</p>
+            <p className="font-medium">{vehicle.destination || 'Loading drop-off location...'}</p>
+          </div>
         </div>
       </div>
-      <div className="space-y-6">
-        <div className="flex justify-between">
-          <div className="flex items-center">
-            <Users className="w-5 h-5 mr-2 text-gray-500" />
-            <span className="text-sm">Up to 4 seats</span>
+
+      {/* Trip Info */}
+      <div className="flex justify-between text-sm">
+        <div className="flex items-center">
+          <Clock className="w-4 h-4 mr-2 text-gray-400" />
+          <span>{vehicle.duration || 'N/A'} min</span>
+        </div>
+        <div className="flex items-center">
+          <Users className="w-4 h-4 mr-2 text-gray-400" />
+          <span>Up to 4 seats</span>
+        </div>
+      </div>
+
+      {/* Fare Details */}
+      <div>
+        <h3 className="font-semibold mb-2">Fare breakdown</h3>
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-gray-600">Base fare</span>
+            <span>₹{vehicle.fare || 0}</span>
           </div>
-          <div className="flex items-center">
-            <Clock className="w-5 h-5 mr-2 text-gray-500" />
-            <span className="text-sm">{vehicle.estimatedTime} min</span>
+          <div className="flex justify-between">
+            <span className="text-gray-600">Distance ({vehicle.distance || 'N/A'} km)</span>
+            <span>₹50</span>
+          </div>
+          <div className="flex justify-between text-base font-semibold mt-2 pt-2 border-t">
+            <span>Total</span>
+            <span>₹{(vehicle.fare || 0) + 50}</span>
           </div>
         </div>
-        <div>
-          <h3 className="font-semibold mb-2 text-lg">Fare Details</h3>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Base fare</span>
-              <span className="font-medium">₹{vehicle.fare}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Distance ({vehicle.distance} km)</span>
-              <span className="font-medium">₹50</span>
-            </div>
-            <div className="flex justify-between text-lg font-semibold mt-2 pt-2 border-t">
-              <span>Total</span>
-              <span>₹{vehicle.fare + 50}</span>
-            </div>
-          </div>
-        </div>
-        <button 
-          className="w-full bg-black text-white p-3 rounded-lg hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-          onClick={handleConfirm}
-        >
-          Confirm {vehicle.name}
-        </button>
       </div>
     </div>
-  </motion.div>
-    );
-}
+  </div>
 
+  {/* Confirm Button */}
+  <div className="p-4 border-t bg-white">
+    <button 
+      className="w-full bg-black text-white p-4 rounded-lg text-lg font-semibold"
+      onClick={handleConfirm}
+      aria-label={`Confirm ${vehicle.name || 'Ride'}`}
+    >
+      Confirm {vehicle.name || 'Ride'}
+    </button>
+  </div>
+</motion.div>
+
+  )}  
 export default VehicleDetails;

@@ -1,78 +1,95 @@
-import React,{useState} from 'react';
-import { motion } from 'framer-motion';
-import { MapPin, Navigation, User, Phone, Clock } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { MapPin, User, Clock, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Header } from "../Components";
+import { useLocation } from "react-router-dom";
+import {LiveTracking} from "../Components";
+// import { useNavigate } from "react-router-dom";
+import axios from "axios";
 function CaptainRidingPage(props) {
-    const rideDetails={
-        dropOff:"Mall",
-        passengerName:"John",
-        estimatedArrival:"4 min"
-    }
-    const [isComplete, setIsComplete] = useState(false);
+  const {state}=useLocation()
+  const{ride,user}=state || {}
+  const token=localStorage.getItem('captoken')
+  console.log(ride)
+  const [isComplete, setIsComplete] = useState(false);
 
-    const navigate=useNavigate()
-    const onCompleteRide=()=>{
-        console.log('Complete rdie clicked');
-        setTimeout(() => {
-            navigate('/capHome');
-          }, 300);
+  const navigate = useNavigate();
+
+  
+  const onCompleteRide = async () => {
+    try {
+     
+     const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/ride/ended`,
+        { rideId:ride._id }, // Body with rideId
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Add token in headers
+          },
+        }
+      );
+
+      if (response.status === 200) {
+      
+        setIsComplete(true);
+  
+        const navigate = useNavigate();
+        navigate("/", { replace: true }); 
+      }
+    } catch (error) {
+      console.error("Error completing ride:", error);
     }
+  };
+
   return (
-    <div className="h-screen flex flex-col">
-      <div className="flex-grow relative">
-        {/* Map placeholder */}
-        <img 
-          src="https://images.pexels.com/photos/8828320/pexels-photo-8828320.jpeg?auto=compress&cs=tinysrgb&w=600" 
-          alt="Map view" 
-          className="w-full h-full object-cover"
-        />
-      </div>
+    <>
+      <div className="flex flex-col min-h-screen bg-gray-100">
+        {/* Header */}
+        <Header />
 
-      <motion.div
-        initial={{ y: 100 }}
-        animate={{ y: 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className="bg-white rounded-t-3xl shadow-lg p-6"
-      >
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Current Ride</h2>
-          <div className="space-y-4">
-            <div className="flex items-center">
-              <User className="w-5 h-5 mr-2 text-gray-500" />
-              <span>{rideDetails.passengerName}</span>
+       
+        <LiveTracking />
+
+        {/* Ride Info */}
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="mx-4 -mt-20 bg-white rounded-lg shadow-lg"
+        >
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="text-2xl font-bold">{ride.distance} Km</h2>
+                <p className="text-gray-500">remaining</p>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-semibold">{ride.duration} min</p>
+                <p className="text-gray-500">arrival</p>
+              </div>
             </div>
-           
-            <div className="flex items-center">
-              <Clock className="w-5 h-5 mr-2 text-gray-500" />
-              <span>Est. arrival: {rideDetails.estimatedArrival}</span>
-            </div>
-            <div className="flex items-center">
-              <MapPin className="w-5 h-5 mr-2 text-red-500" />
-              <span>{rideDetails.dropOff}</span>
-            </div>
+
+            <h3 className="text-lg font-semibold">Passenger {user.fullname.firstname}</h3>
+            <p className="text-gray-500">Destination: {ride.destination}</p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="mt-6">
-        <motion.button
-        className="w-full bg-black text-white py-2 rounded hover:bg-gray-900"
-        onClick={onCompleteRide}
-        initial={{ opacity: 1, scale: 1 }}
-        animate={{ opacity: isComplete ? 0 : 1, scale: isComplete ? 0.8 : 1 }}
-        transition={{
-          type: 'spring',
-          stiffness: 400, // Controls the speed of the animation
-          damping: 25, // Controls the bounciness
-          duration: 0.1, // Matches the duration of the transition
-        }}
-        disabled={isComplete} // Disable button after clicking
-      >
-        {isComplete ? "Ride Completed" : "Complete Ride"}
-      </motion.button>
+        {/* Footer */}
+        <motion.footer
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.2 }}
+          className="bg-white p-4 shadow-lg mt-4"
+        >
+          <button
+          onClick={onCompleteRide} 
+          className="w-full py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300 flex items-center justify-center">
+            <MapPin className="mr-2 h-5 w-5" />
+            Complete Ride
+          </button>
+        </motion.footer>
       </div>
-      </motion.div>
-      </div>
+    </>
   );
 }
 

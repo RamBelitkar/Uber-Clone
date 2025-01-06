@@ -1,7 +1,7 @@
 import express from 'express'
 import {body} from 'express-validator'
-import { getCapProfile, loginCaptain, logoutCap, registerCaptain } from '../controllers/captain-controllers.js'
-import { authmiddlewareCap } from '../middleware/auth-middleware.js'
+import { getCapProfile,  loginCaptain, logoutCap, registerCaptain } from '../controllers/captain-controllers.js'
+import { authmiddlewareCap, authmiddlewareUser } from '../middleware/auth-middleware.js'
 const Captainroute=express.Router()
 
 Captainroute.post('/register',
@@ -27,7 +27,6 @@ loginCaptain
 
 Captainroute.get('/profile',authmiddlewareCap,getCapProfile)
 Captainroute.get('/logout',authmiddlewareCap,logoutCap)
-
 
 
 

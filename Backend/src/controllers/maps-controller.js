@@ -25,13 +25,13 @@ export const getCoordinates=asyncHandler(async (req,res) => {
             message:"Address not found"
         })
     }
-    const{Latitude,Longitude}=response
+    const{latitude,longitude}=response
     
     
     return res.status(200)
     .json({
-        Longitude,
-        Latitude
+        longitude,
+        latitude
     })
 
 

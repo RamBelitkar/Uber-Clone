@@ -11,8 +11,12 @@
   },
   "dependencies": {
     "@motionone/utils": "^10.18.0",
+    "@react-google-maps/api": "^2.20.5",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.7.1",
     "axios": "^1.7.9",
     "framer-motion": "^11.15.0",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.469.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

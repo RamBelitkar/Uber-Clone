@@ -23,7 +23,7 @@ const token=localStorage.getItem('captoken')
       })
       .then((response) => {
         if (response.status === 200) {
-          console.log(response.data.cap)
+          // console.log(response.data.cap)
           setCaptain(response.data.cap);
           setLoading(false);
         }

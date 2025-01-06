@@ -4,6 +4,7 @@ import { CheckCircle } from 'lucide-react';
 import VehicleDetails from './VehicleDetails'; // Import VehicleDetails component
 
 function ConfirmRide({ vehicle, onConfirm, onCancel }) {
+  
     return (
       <motion.div
         initial={{ opacity: 0, y: 50 }}

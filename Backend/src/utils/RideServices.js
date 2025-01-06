@@ -1,6 +1,10 @@
+import { CaptainModel } from "../models/captain-model.js";
 import { RideModel } from "../models/ride-schema.js";
 import { getDistanceandTime} from "./MapServices.js";
 import crypto from 'crypto'
+
+
+
 export async function calcFare(origin,destination) {
 
     
@@ -37,4 +41,25 @@ export function generateOtp(num){
     //The num is the length of otp
     const otp = crypto.randomInt(0, Math.pow(10, num)).toString().padStart(num, '0');
     return otp;
+}
+
+
+export const getNearbyCaptains=async function(lat,lng,radius){
+    if(!lat || !lng || !radius){
+        throw new Error('Parameters missing')
+    }
+    //Radius is in km
+    const nearbyCaptain=await CaptainModel.find({
+        location:{
+            $geoWithin:{
+                $centerSphere:[[lat,lng],radius /6371]
+            }
+        }
+     })
+
+     if(!nearbyCaptain){
+        return null
+     }
+
+     return nearbyCaptain
 }

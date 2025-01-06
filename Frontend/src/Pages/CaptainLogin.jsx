@@ -8,7 +8,7 @@ export function CapLogin() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [captain,setCaptain]=useContext(CaptainDataContext)
+    const {captain,setCaptain}=useContext(CaptainDataContext)
     const nav=useNavigate()
     const handleSubmit=async(e)=>{
         e.preventDefault()

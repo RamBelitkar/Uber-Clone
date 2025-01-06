@@ -10,6 +10,7 @@ import CaptainLogout from "./CaptainLogout.jsx";
 import ProtectedWrapper from "./ProtectedWraper.jsx";
 import CaptainProtected from "./CaptainProtected.jsx";
 import CaptainRiding from "./CaptainRiding.jsx";
+import UserRideStarted from "./UserRideStarted.jsx";
 export {
     LandingPage,
     UserLogin,
@@ -22,5 +23,6 @@ export {
     CaptainProtected,
     ProtectedWrapper,
     CaptainLogout,
-    CaptainRiding
+    CaptainRiding,
+    UserRideStarted
 }

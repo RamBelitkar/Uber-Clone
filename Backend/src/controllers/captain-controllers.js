@@ -1,5 +1,6 @@
 import { blackListModel } from "../models/blacklistToken-model.js";
 import { CaptainModel } from "../models/captain-model.js";
+import { RideModel } from "../models/ride-schema.js";
 import { asyncHandler } from "../utils/Asynchandler.js";
 import { validationResult } from "express-validator";
 
@@ -124,3 +125,5 @@ export const logoutCap=asyncHandler(async (req,res) => {
         message:"Logout Success"
     })
 })
+
+

@@ -2,6 +2,7 @@ import express from 'express'
 import {body} from 'express-validator'
 import { getProfile, loginUser, logoutUser, registerUser } from '../controllers/user-controllers.js'
 import {  authmiddlewareUser } from '../middleware/auth-middleware.js'
+// import { getNearbyCaptains } from '../controllers/captain-controllers.js'
 const routes=express.Router()
 
 routes.post('/register',[

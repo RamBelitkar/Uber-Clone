@@ -13,12 +13,12 @@ export const getLatLng=async (address) => {
           key: key,  // Ensure you send your API key
         },
       });
-      console.log(response.data.results[0].geometry.location)
+      // console.log(response.data.results[0].geometry.location)
       if (response.status === 200 && response.data.status === "OK") {
         const location = response.data.results[0].geometry.location;
         return {
-            Latitude: location.lat,
-            Longitude: location.lng,
+            latitude: location.lat,
+            longitude: location.lng,
         }
       }
      else{

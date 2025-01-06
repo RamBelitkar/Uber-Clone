@@ -8,6 +8,8 @@ import LocationInput from "./LocationInput";
 import RecentTrips from "./RecentTrips";
 import ConfirmRide  from "./ConfirmRide";
 import { OffersSection } from "./OfferSection";
+import LiveTracking from "./LiveTracking";
+import UserPaymentPopup from "./UserPaymentPage";
 export {
     Testimonials,
     VehicleDetails,
@@ -18,5 +20,7 @@ export {
     LocationInput,
     RecentTrips,
     OffersSection,
-    ConfirmRide
+    ConfirmRide,
+   LiveTracking,
+   UserPaymentPopup
 }

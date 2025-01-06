@@ -4,6 +4,8 @@ import { Routes, Route } from 'react-router-dom';
 import { CapLogin, CapSignup,UserLogin, UserSignup,LandingPage, UserLogout, CaptainHome,CaptainLogout, UserHomePage } from './Pages';
 // import { CaptainProtected,ProtectedWrapper } from './Pages';
 import { CaptainProtected,ProtectedWrapper,CaptainRiding } from './Pages';
+import UserRideStarted from './Pages/UserRideStarted';
+import CaptainRidingPage from './Pages/CaptainRiding';
 
 function App() {
  
@@ -36,12 +38,19 @@ function App() {
           <CaptainLogout/>
         </CaptainProtected>
           }/>
-          <Route path='/captainRiding' element={
+          <Route path='/captainRideStarted' element={
             <CaptainProtected>
-              <CaptainRiding/>
+              <CaptainRidingPage/>
             </CaptainProtected>
           }/>
+        <Route path='/rideStarted' element={
+           <ProtectedWrapper>
+           <UserRideStarted/>
+          </ProtectedWrapper>
+        }/>
+       
 
+        
       </Routes>
     </>
   );

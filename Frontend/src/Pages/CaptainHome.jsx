@@ -12,30 +12,59 @@ function CaptainHome() {
         { id: 3, pickup: "Empire State Building", dropoff: "Metropolitan Museum", estimatedTime: 20, fare: 30, passengerName: "Bob Johnson" },
       ];
     const [rideRequests, setRideRequests] = useState(mockRideRequests);
-    const [acceptedRides, setAcceptedRides] = useState([]);
-  
+    const [rides, setRides] = useState({});
+      const [acceptedRides,setAcceptedRides]=useState([])
     const handleAcceptRide = (rideId) => {
       const acceptedRide = rideRequests.find(ride => ride.id === rideId);
       setAcceptedRides([...acceptedRides, acceptedRide]);
       setRideRequests(rideRequests.filter(ride => ride.id !== rideId));
     };
-
+const [location,setLocation]=useState()
 const {captain}=useContext(CaptainDataContext)
 const {socket}=useContext(SocketContext)
 
 useEffect(()=>{
-  console.log('sending captian',`${captain}`)
+  // console.log('sending captian',`${captain}`)
 socket.emit('join',{userId:captain._id,role:"captain"})
+
+const sendLocation=function()
+{
+  // console.log('location gets called');
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(location=>
+     {
+      socket.emit('update-location',{
+        id:captain._id,
+        location:{
+          lat:location.coords.latitude,
+          lng:location.coords.longitude
+        }
+      })
+     }
+    )
+  }
+}
+
+
+
+const locationDelay=setInterval(sendLocation,5000)//storing the delay in an variable so that unmounting can be easy
+return()=>clearInterval(locationDelay)
+
+},[captain])
+
+
+socket.on('new-ride',(data)=>{
+  // console.log(data);
+  setRides(data)
 })
-
-
-
 
 
     return (
         <>
         <Header/>
-        {/* <DriverAcceptRide/> */}
+        <DriverAcceptRide
+        rideData={rides}
+        />
        <div className="p-4 max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Available Ride Requests</h1>
       
