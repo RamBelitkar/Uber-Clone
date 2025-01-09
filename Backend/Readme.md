@@ -1,6 +1,20 @@
 # Uber Project Backend
 
-This repository contains the backend implementation for the Uber Project. The project is designed to handle various functionalities such as user and captain registration, authentication, and more.
+This repository contains the backend implementation for the Uber Project. The project is designed to handle various functionalities such as user and captain registration, authentication, ride management, and payment processing.
+
+---
+
+## Features
+
+- User and Captain Registration
+- User and Captain Login
+- Ride Creation, Acceptance, and Management
+- OTP-based Ride Start Verification
+- Fare Estimation
+- Payment Processing
+- Coordinate Retrieval for Addresses
+
+---
 
 ## Installation
 
@@ -16,7 +30,12 @@ This repository contains the backend implementation for the Uber Project. The pr
    ```bash
    npm install
    ```
-4. Create a `.env` file and configure your environment variables (e.g., database connection string, JWT secret).
+4. Create a `.env` file and configure your environment variables, such as:
+   - `PORT` (default: 3000)
+   - `DB_URI` (your MongoDB connection string)
+   - `JWT_SECRET` (your secret for JSON Web Tokens)
+
+---
 
 ## Usage
 
@@ -24,22 +43,14 @@ This repository contains the backend implementation for the Uber Project. The pr
    ```bash
    npm start
    ```
-2. The server will run on `http://localhost:<port>` (default port is `3000` unless specified otherwise in the `.env` file).
+2. The server will run on `http://localhost:<port>` (default port is `3000`, unless specified otherwise in the `.env` file).
 
 ---
 
 ## API Endpoints
-### Updated API Endpoints Documentation
-
----
 
 ### **1. Register User**
-
-**Endpoint**:  
-`POST /user/register`
-
-**Description**:  
-Registers a new user in the system.
+**Endpoint**: `POST /user/register`
 
 **Request Body**:
 ```json
@@ -52,65 +63,14 @@ Registers a new user in the system.
   "password": "yourpassword"
 }
 ```
-
-**Validation**:
-- `email`: Must be a valid email.
-- `password`: Must be at least 3 characters long.
-- `fullname.firstname`: Must be at least 3 characters long.
-
 **Response**:
-
-- **Success** (`201 Created`):
-  ```json
-  {
-    "message": "New user created",
-    "newUser": {
-      "fullname": {
-        "firstname": "John",
-        "lastname": "Doe"
-      },
-      "email": "johndoe@example.com"
-    },
-    "token": "your-jwt-token"
-  }
-  ```
-
-- **Validation Error** (`400 Bad Request`):
-  ```json
-  {
-    "errors": [
-      {
-        "msg": "Invalid email",
-        "param": "email",
-        "location": "body"
-      }
-    ]
-  }
-  ```
-
-- **User Already Exists** (`400 Bad Request`):
-  ```json
-  {
-    "message": "User already exists",
-    "user": {
-      "fullname": {
-        "firstname": "John",
-        "lastname": "Doe"
-      },
-      "email": "johndoe@example.com"
-    }
-  }
-  ```
+- `201 Created`: User registered successfully.
+- `400 Bad Request`: Validation errors or user already exists.
 
 ---
 
 ### **2. Login User**
-
-**Endpoint**:  
-`POST /user/login`
-
-**Description**:  
-Logs in an existing user by verifying their email and password.
+**Endpoint**: `POST /user/login`
 
 **Request Body**:
 ```json
@@ -119,50 +79,15 @@ Logs in an existing user by verifying their email and password.
   "password": "yourpassword"
 }
 ```
-
-**Validation**:
-- `email`: Must be a valid email.
-- `password`: Must not be empty.
-
 **Response**:
-
-- **Success** (`200 OK`):
-  ```json
-  {
-    "message": "Login successful",
-    "token": "your-jwt-token"
-  }
-  ```
-
-- **Validation Error** (`400 Bad Request`):
-  ```json
-  {
-    "errors": [
-      {
-        "msg": "Invalid email",
-        "param": "email",
-        "location": "body"
-      }
-    ]
-  }
-  ```
-
-- **Invalid Credentials** (`401 Unauthorized`):
-  ```json
-  {
-    "message": "Invalid email or password"
-  }
-  ```
+- `200 OK`: Login successful.
+- `400 Bad Request`: Validation errors.
+- `401 Unauthorized`: Invalid credentials.
 
 ---
 
 ### **3. Register Captain**
-
-**Endpoint**:  
-`POST /captain/register`
-
-**Description**:  
-Registers a new captain in the system. Similar to the user registration process but also includes vehicle details.
+**Endpoint**: `POST /captain/register`
 
 **Request Body**:
 ```json
@@ -181,57 +106,14 @@ Registers a new captain in the system. Similar to the user registration process 
   }
 }
 ```
-
-**Validation**:
-- All validations for `fullname`, `email`, and `password` are the same as for users.
-- `vehicle.capacity`: Must be an integer.
-- `vehicle.vehicleType`: Must be a valid string.
-
 **Response**:
-
-- **Success** (`201 Created`):
-  ```json
-  {
-    "message": "New captain registered",
-    "newCaptain": {
-      "fullname": {
-        "firstname": "Jane",
-        "lastname": "Smith"
-      },
-      "email": "janesmith@example.com",
-      "vehicle": {
-        "color": "Red",
-        "plate": "ABC-1234",
-        "capacity": 4,
-        "vehicleType": "Car"
-      }
-    },
-    "token": "your-jwt-token"
-  }
-  ```
-
-- **Validation Error** (`400 Bad Request`):
-  ```json
-  {
-    "errors": [
-      {
-        "msg": "Invalid vehicleType",
-        "param": "vehicle.vehicleType",
-        "location": "body"
-      }
-    ]
-  }
-  ```
+- `201 Created`: Captain registered successfully.
+- `400 Bad Request`: Validation errors.
 
 ---
 
 ### **4. Login Captain**
-
-**Endpoint**:  
-`POST /captain/login`
-
-**Description**:  
-Logs in an existing captain using their email and password. The process is the same as the user login.
+**Endpoint**: `POST /captain/login`
 
 **Request Body**:
 ```json
@@ -240,82 +122,139 @@ Logs in an existing captain using their email and password. The process is the s
   "password": "yourpassword"
 }
 ```
-
 **Response**:
-
-- **Success** (`200 OK`):
-  ```json
-  {
-    "message": "Login successful",
-    "token": "your-jwt-token"
-  }
-  ```
-
-- **Validation Error** (`400 Bad Request`):
-  ```json
-  {
-    "errors": [
-      {
-        "msg": "Invalid email",
-        "param": "email",
-        "location": "body"
-      }
-    ]
-  }
-  ```
-
-- **Invalid Credentials** (`401 Unauthorized`):
-  ```json
-  {
-    "message": "Invalid email or password"
-  }
-  ```
+- `200 OK`: Login successful.
+- `400 Bad Request`: Validation errors.
+- `401 Unauthorized`: Invalid credentials.
 
 ---
 
-### **5. Logout (User and Captain)**
+### **5. Create Ride**
+**Endpoint**: `POST /create`
 
-**Endpoint**:  
-`POST /logout`
-
-**Description**:  
-Logs out the currently authenticated user or captain by blacklisting their token.
-
-**Request Header**:
+**Request Body**:
 ```json
 {
-  "Authorization": "Bearer <jwt-token>"
+  "pickUp": "Location A",
+  "drop": "Location B",
+  "vehicleType": "car"
 }
 ```
-
 **Response**:
+- `201 Created`: Ride created successfully.
+- `400 Bad Request`: Validation errors.
 
-- **Success** (`200 OK`):
-  ```json
-  {
-    "message": "Logout successful"
-  }
-  ```
+---
 
-- **Unauthorized** (`401 Unauthorized`):
-  ```json
-  {
-    "message": "Unauthorized, Invalid or expired token"
-  }
-  ```
+### **6. Accept Ride**
+**Endpoint**: `POST /accept`
 
-**Notes**:
-- The JWT token is invalidated by adding it to the blacklist collection.
+**Request Body**:
+```json
+{
+  "rideId": "ride-id"
+}
+```
+**Response**:
+- `200 OK`: Ride accepted successfully.
+- `400 Bad Request`: Validation errors.
+
+---
+
+### **7. Start Ride**
+**Endpoint**: `POST /start`
+
+**Request Body**:
+```json
+{
+  "rideId": "ride-id",
+  "otp": "123456"
+}
+```
+**Response**:
+- `200 OK`: Ride started successfully.
+- `400 Bad Request`: Validation errors.
+
+---
+
+### **8. End Ride**
+**Endpoint**: `POST /ended`
+
+**Request Body**:
+```json
+{
+  "rideId": "ride-id"
+}
+```
+**Response**:
+- `200 OK`: Ride completed successfully.
+- `400 Bad Request`: Validation errors.
+
+---
+
+### **9. Get Fares**
+**Endpoint**: `POST /getFares`
+
+**Request Body**:
+```json
+{
+  "pickup": "Location A",
+  "drop": "Location B"
+}
+```
+**Response**:
+- `200 OK`: Fare estimate fetched successfully.
+- `400 Bad Request`: Validation errors.
+
+---
+
+### **10. Make Payment**
+**Endpoint**: `PUT /payment`
+
+**Request Body**:
+```json
+{
+  "rideId": "ride-id",
+  "paymentType": "online"
+}
+```
+**Response**:
+- `200 OK`: Payment processed successfully.
+- `400 Bad Request`: Validation errors.
+
+---
+
+### **11. Get Coordinates**
+**Endpoint**: `GET /getCo-ordinates`
+
+**Request Body**:
+```json
+{
+  "address": "123 Main Street"
+}
+```
+**Response**:
+- `200 OK`: Coordinates fetched successfully.
+- `400 Bad Request`: Validation errors.
+
+---
+
+## Environment Variables
+
+The project requires the following environment variables:
+- `PORT`: The port on which the server runs (default: 3000).
+- `DB_URI`: MongoDB connection string.
+- `JWT_SECRET`: Secret for signing JSON Web Tokens.
 
 ---
 
 ## Technologies Used
 
-- **Node.js**: Runtime environment.
-- **Express.js**: Web framework.
-- **MongoDB**: Database.
-- **Mongoose**: ODM library for MongoDB.
-- **express-validator**: Middleware for request validation.
-- **jsonwebtoken**: For token-based authentication.
+- **Node.js**: Backend runtime environment.
+- **Express.js**: Web application framework.
+- **MongoDB**: Database for data storage.
+- **JWT**: Authentication and authorization.
 
 ---
+
+
