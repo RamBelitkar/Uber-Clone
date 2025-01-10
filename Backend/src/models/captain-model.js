@@ -63,6 +63,10 @@ const CaptainSchema=mongoose.Schema({
         lng:{
             type:Number
         }
+    },
+    rating:{
+        type:String,
+        default:"3.5"
     }
 
 })

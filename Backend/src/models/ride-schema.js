@@ -33,7 +33,6 @@ const rideSchema=new mongoose.Schema({
     paymentType:{
         type:String,
         enum:['cash','online'],
-        default:'online'
     },
     signature:{
         type:String
@@ -50,7 +49,7 @@ const rideSchema=new mongoose.Schema({
         type:String,
         required:true
     }
-})
+},{timestamps:true})
 
 
 

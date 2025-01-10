@@ -1,3 +1,4 @@
+import { CaptainModel } from "../models/captain-model.js";
 import { RideModel } from "../models/ride-schema.js";
 import { asyncHandler } from "../utils/Asynchandler.js";
 import { sendMessage } from "../utils/GlobalSocket.js";
@@ -11,7 +12,7 @@ import { validationResult } from "express-validator";
 export const createRide=asyncHandler(async (req,res) => {
    const  validationErr=validationResult(req)
    if(!validationErr.isEmpty()){
-    res.status(400) 
+   return res.status(400) 
     .json({
         error:validationErr.array()
     })
@@ -167,10 +168,9 @@ export const startRide=asyncHandler(async (req,res) => {
         throw new Error("Error Otp invalid")
     }
 
-    ride.status='ongoing'
-    await ride.save({
-        validateBeforeSave:false,
-      })
+    await RideModel.findByIdAndUpdate({_id:rideId},{
+        status:'ongoing'
+    })
 
       const user=ride.User
       sendMessage(user.socketId,{
@@ -222,10 +222,11 @@ export const endRide=asyncHandler(async (req,res) => {
     })
 
     const user=ride.User
-    sendMessage(user.socketId,{
-      event:'make-payment',
-      data:ride
-    })    
+    sendMessage(ride.User.socketId,{
+        event:'payment',
+        data:ride
+    })   
+
     return res.status(200).json({
         ride,
         message:"Ride Completed"
@@ -236,27 +237,32 @@ export const makePayment=asyncHandler(async (req,res) => {
     const validationErr=validationResult(req)
 
     if(!validationErr.isEmpty()){
-        res.status(400).
+    return res.status(400).
         json({
             error:validationErr.array()
         })
     }
-    const {rideId,fare,paymentType}=req.body
+    const {rideId,fare,paymentType,rating}=req.body
 
-    if(!rideId || !fare || !paymentType){
-        res.status(404).
+    if(!rideId || !fare || !paymentType || !rating){
+    return res.status(404).
         json({
             message:'Ride id missing or fare missing'
         })
     }
     const ride=await RideModel.findOne({_id:rideId}).populate('User').populate('Captain')
     if(!ride){
-        res.status(400)
+    return    res.status(400)
         .json({
             message:"Ride Id not found"
         })
     }
-
+    const captain=ride.Captain
+    await CaptainModel.findByIdAndUpdate({
+        _id:captain._id
+    },
+    {rating:rating}
+    )
     if(ride.status!=='completed'){
     throw new Error('Ride not completed')
     }
@@ -274,5 +280,59 @@ export const makePayment=asyncHandler(async (req,res) => {
 
 })
 
+export const seeRides=asyncHandler(async (req,res) => {
+        const validationErr=validationResult(req)
+    if(!validationErr.isEmpty()){
+     return   res.status(400).
+        json({
+            error:error.array()
+        })
+    }
+    const {requirement}=req.query
+    const user=req.user
+    const rides = await RideModel.find({
+        status: requirement, // Filter by status
+        User: user._id,      // Filter by userId
+      }).sort({ createdAt: -1 }).limit(5); // Sort by recent and limit results
 
-// const makePayment
+
+    if(!rides){
+       return res.status(400).
+        json({
+            message:"Rides not found incorrect requiement"
+        })
+    }
+    return res.status(200)
+    .json({
+        message:"Rides found Successfully",
+        rides
+    })
+    
+
+})
+// Rides can be fetched like cancelled rides completed rides
+
+
+
+// const cancelRides=asyncHandler(async (req,res) => {
+//   const validationErr=validationResult(req)
+  
+//   if(!validationErr.isEmpty()){
+//     return res.status(400)
+//     .json({
+//         error: validationErr.array()
+//     })
+//   }
+
+//   const {rideId}=req.body
+
+//   if(!rideId){
+//     throw new Error("Ride Id Missing")
+//   }
+//   const ride=await RideModel.findById({_id:rideId}).populate('Captain')
+
+//   if(ride.status==='pending')
+
+
+
+// })

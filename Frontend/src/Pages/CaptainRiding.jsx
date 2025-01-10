@@ -32,9 +32,7 @@ function CaptainRidingPage(props) {
       if (response.status === 200) {
       
         setIsComplete(true);
-  
-        const navigate = useNavigate();
-        navigate("/", { replace: true }); 
+        navigate("/caphome"); 
       }
     } catch (error) {
       console.error("Error completing ride:", error);

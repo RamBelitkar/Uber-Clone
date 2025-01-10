@@ -11,7 +11,9 @@ import ProtectedWrapper from "./ProtectedWraper.jsx";
 import CaptainProtected from "./CaptainProtected.jsx";
 import CaptainRiding from "./CaptainRiding.jsx";
 import UserRideStarted from "./UserRideStarted.jsx";
+import PaymentPage from "./PaymentPage.jsx";
 export {
+    PaymentPage,
     LandingPage,
     UserLogin,
     CapLogin,

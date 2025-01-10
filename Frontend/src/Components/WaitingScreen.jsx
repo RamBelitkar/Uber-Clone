@@ -38,17 +38,21 @@ const WaitingScreen = ({ vehicle, onBack }) => {
 
     createRide();
 
-    // Set up socket event listener
-    socket.on('accept-ride', (data) => {
-      console.log('Driver accepted', data);
-      setRideDetails(data); // Set the ride details to trigger VehicleDetails rendering
-    });
-    console.log(rideDetails)
-  
-    return () => {
-      socket.off('accept-ride');
-    };
+    
   }, [vehicle, onBack, socket]);
+
+useEffect(() => {
+  // Set up socket event listener
+  socket.on('accept-ride', (data) => {
+    console.log('Driver accepted', data);
+    setRideDetails(data); // Set the ride details to trigger VehicleDetails rendering
+  });
+  console.log(rideDetails)
+
+  return () => {
+    socket.off('accept-ride');
+  };
+}, [socket]);
 
   // Conditional rendering: show VehicleDetails if rideDetails is available
   if (rideDetails) {

@@ -1,13 +1,33 @@
-import React from "react"
+import React, { useState,useCallback,useEffect } from "react"
 import {ArrowRight,MapPin } from 'lucide-react';
+import axios from "axios";
 
 
 const RecentTrips=()=>{
-    const recentTrips = [
-        { id: 1, destination: 'Work', address: '123 Office St, City', time: '25 mins ago' },
-        { id: 2, destination: 'Gym', address: '456 Fitness Ave, Town', time: '2 days ago' },
-        { id: 3, destination: 'Airport', address: 'International Airport', time: '1 week ago' },
-      ];
+  const token=localStorage.getItem('usertoken')
+   const [recentTrips,setRecenttrips]=useState([])
+  useEffect(() => {
+    const seeRides = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}/ride/seeRides`,
+          {
+            params: { requirement: 'pending' }, // Use `params` for query parameters
+            headers: {
+              Authorization: `Bearer ${token}`, // Include token in headers
+            },
+          }
+        );
+        if (response.status === 200) {
+          setRecenttrips(response.data.rides); // Update state with the fetched rides
+        }
+      } catch (error) {
+        console.error('Error fetching rides:', error); // Add error handling
+      }
+    };
+  
+    seeRides();
+  }, []);
 
       return(
         <section className="mb-8">

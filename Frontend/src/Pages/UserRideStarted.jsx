@@ -4,31 +4,41 @@
   import { useLocation } from "react-router-dom";
   import { Header,LiveTracking, UserPaymentPopup } from "../Components";
   import { SocketContext } from "../Context/SocketContext";
-
+import { useNavigate } from "react-router-dom";
   function UserRideStarted() {
     const [fareDetails, setFareDetails] = useState(null); // State to store ride fare details
     const [showPayment, setShowPayment] = useState(false); // State to toggle showing payment component
-
+    const nav=useNavigate()
     const {state}=useLocation()
 
     const {vehicle,captain}=state || {}
-    
+      
     const {socket}=useContext(SocketContext)
+    console.log(captain)
+
     useEffect(() => {
-      // Only listen when socket is available
-      if (socket) {
-        socket.on("make-payment", (rideData) => {
-          // Handle the event and set fare details
-          setFareDetails(rideData.vehicle.fare); // Assuming rideData contains fare details
-          setShowPayment(true); // Show the payment popup
-        });
-  
-        // Cleanup on component unmount
-        return () => {
-          socket.off("make-payment");
-        };
+      if (!vehicle || !captain) {
+        console.error("Vehicle or captain data is missing");
+        return;
       }
-    }, [socket]);
+    
+      socket.on('payment', () => {
+        console.log('Payment event received');
+        nav('/payment', {
+          state: {
+            vehicle,
+            captain,
+          },
+        });
+      });
+    
+      // Clean up the socket listener
+      return () => {
+        socket.off('payment');
+      };
+    }, [socket, nav, vehicle, captain]);
+    
+    
   
       return (
           <>
@@ -82,7 +92,7 @@
 
         <div>
         {/* Render the payment component when showPayment is true */}
-        {showPayment && fareDetails && <UserPaymentPopup fareDetails={fareDetails} />}
+          {/* {showPayment && fareDetails && <UserPaymentPopup fareDetails={fareDetails} />} */}
       </div>
       </div>
       </>
