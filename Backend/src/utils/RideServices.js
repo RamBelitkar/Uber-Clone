@@ -63,3 +63,10 @@ export const getNearbyCaptains=async function(lat,lng,radius){
 
      return nearbyCaptain
 }
+
+
+export const calcFine=(fare)=>{
+    const fine = Math.round(fare * 0.1); // 10% of the fare
+    return fine;
+}
+

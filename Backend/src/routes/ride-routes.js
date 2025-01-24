@@ -1,6 +1,6 @@
 import e from "express";
 import { body,query } from "express-validator";
-import { confirmRide, createRide, endRide, getFare, makePayment, seeRides, startRide } from "../controllers/ride-controller.js";
+import { cancelRide, confirmRide, createRide, endRide, getFare, makePayment, seeRides, startRide } from "../controllers/ride-controller.js";
 import { authmiddlewareCap, authmiddlewareUser } from "../middleware/auth-middleware.js";
 
 const rideRoute=e.Router()
@@ -67,4 +67,12 @@ rideRoute.get('/seeRides',
     ],
     seeRides
 )
+
+rideRoute.put('/cancelRide',
+    [
+        body('rideId').isMongoId().withMessage('Invalid Ride ID')
+    ],
+    cancelRide
+)
+
 export default rideRoute

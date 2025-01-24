@@ -41,7 +41,7 @@ export const getCoordinates=asyncHandler(async (req,res) => {
 export const getDistance=async (req,res) => {
    try {
      const {origin,destination}=req.body
- console.log(origin);
+//  console.log(origin);
      if(!origin || !destination){
          throw new Error('Please provide both location')
      }

@@ -16,16 +16,28 @@ export function CapLogin() {
           email:email,
           password:password
          })
-          const res=await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/login`,existUser)
-          if(res.status===200){
-            const data=res.data
+         try {
+          const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/login`, existUser);
+          if (res.status === 200) {
+            const data = res.data;
             console.log(data.message);
-            localStorage.setItem('captoken',data.token)
-            nav('/caphome')
+            localStorage.setItem('captoken', data.token);
+            nav('/caphome');
           }
+        } catch (err) {
+          if (err.response) {
+            if (err.response.status === 400) {
+              setErrors(err.response.data.message || 'Invalid credentials. Please try again.');
+            } else {
+              setErrors(err.response.data.message || 'Something went wrong. Please try again later.');
+            }
+          } else {
+            setErrors('An unexpected error occurred. Please check your connection and try again.');
+          }
+        }
+      };
       
-    }
-    
+    const [errors,setErrors]=useState('')
   return (
     <>
     <Header />
@@ -37,7 +49,7 @@ export function CapLogin() {
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3 text-center">
           Welcome Back! Cap About Time
         </h2>
-  
+        {errors && <p className="text-red-500 text-center mb-3">{errors}</p>}
         <div className="mb-3">
           <label
             htmlFor="email"

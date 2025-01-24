@@ -37,7 +37,7 @@ const token=localStorage.getItem('captoken')
    }, [token,nav,setCaptain]);
 
    if (loading) {
-    return <h1>Ruk Lode.....</h1>;
+    return <h1>Loading.....</h1>;
   }
     return (
         <>

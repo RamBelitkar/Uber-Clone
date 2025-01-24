@@ -1,3 +1,7 @@
+Sure! Here’s the updated **README** with the added functionality for canceling a ride and applying a fine for accepted rides:
+
+---
+
 # Uber Project Backend
 
 This repository contains the backend implementation for the Uber Project. The project is designed to handle various functionalities such as user and captain registration, authentication, ride management, and payment processing.
@@ -13,6 +17,7 @@ This repository contains the backend implementation for the Uber Project. The pr
 - Fare Estimation
 - Payment Processing
 - Coordinate Retrieval for Addresses
+- Ride Cancellation with Fine for Accepted Rides
 
 ---
 
@@ -239,6 +244,28 @@ This repository contains the backend implementation for the Uber Project. The pr
 
 ---
 
+### **12. Cancel Ride**
+**Endpoint**: `PUT /cancelRide`
+
+**Request Body**:
+```json
+{
+  "rideId": "ride-id"
+}
+```
+**Response**:
+- `200 OK`: Ride cancelled successfully.
+- `400 Bad Request`: Validation errors.
+- `404 Not Found`: Ride not found.
+- `500 Internal Server Error`: Something went wrong.
+
+**Description**:
+- This endpoint allows users to cancel a ride.
+- If the ride is accepted, a 10% fine will be charged to the consumer based on the fare.
+- If the ride is not accepted, the cancellation will be free.
+
+---
+
 ## Environment Variables
 
 The project requires the following environment variables:
@@ -257,4 +284,4 @@ The project requires the following environment variables:
 
 ---
 
-
+This README now includes the cancel ride functionality with a fine for accepted rides. Let me know if you need further changes!

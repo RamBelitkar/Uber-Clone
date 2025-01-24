@@ -3,7 +3,7 @@ import { RideModel } from "../models/ride-schema.js";
 import { asyncHandler } from "../utils/Asynchandler.js";
 import { sendMessage } from "../utils/GlobalSocket.js";
 import { getLatLng } from "../utils/MapServices.js";
-import { calcFare, generateOtp, getNearbyCaptains } from "../utils/RideServices.js";
+import { calcFare, calcFine, generateOtp, getNearbyCaptains } from "../utils/RideServices.js";
 import { validationResult } from "express-validator";
 
 
@@ -314,7 +314,7 @@ export const seeRides=asyncHandler(async (req,res) => {
 
 
 
-// const cancelRides=asyncHandler(async (req,res) => {
+// export const cancelPendingRides=asyncHandler(async (req,res) => {
 //   const validationErr=validationResult(req)
   
 //   if(!validationErr.isEmpty()){
@@ -331,8 +331,81 @@ export const seeRides=asyncHandler(async (req,res) => {
 //   }
 //   const ride=await RideModel.findById({_id:rideId}).populate('Captain')
 
-//   if(ride.status==='pending')
+//   if (ride.status !== "pending") {
+//     return res.status(400).json({
+//       message: "Only pending rides can be cancelled",
+//     });
+//   }
 
+//   // Cancel the ride
+//   await RideModel.findByIdAndUpdate({_id:rideId},{
+//     status:"cancelled"
+//   });
+  
+//   if (ride.Captain && ride.Captain.socketId) {
+//     sendMessage(ride.Captain.socketId, {
+//       event: "ride-cancel",
+//       data: ride,
+//     });
+//   }
+
+//   return res.status(200).json({
+//     message: "Ride cancelled successfully",
+//   });
 
 
 // })
+
+export const cancelRide = asyncHandler(async (req, res) => {
+    const validationErr = validationResult(req);
+    if (!validationErr.isEmpty()) {
+        return res.status(400).json({ error: validationErr.array() });
+    }
+
+    const { rideId } = req.body;
+    if (!rideId) {
+        throw new Error("Ride ID is required");
+    }
+
+    const ride = await RideModel.findById(rideId).populate('Captain');
+    if (!ride) {
+        return res.status(404).json({ message: "Ride not found" });
+    }
+    const {pickup}=ride
+
+    const getPickup=await getLatLng(pickup)
+
+    const nearbyCaptains=await getNearbyCaptains(getPickup.latitude,getPickup.longitude,2)
+    // console.log(nearbyCaptains)
+    
+    const { status } = ride;
+    if (status === 'pending') {
+        await RideModel.findByIdAndUpdate({_id:rideId},{
+            status:"cancelled"
+          });
+         nearbyCaptains.forEach(captain => {
+            sendMessage(captain.socketId, {
+                event: "ride-cancel-nearby",
+                data: ride,
+            });
+        });
+          return res.status(200).
+          json({ message: "Pending ride cancelled successfully" });
+    }
+
+    if (status === 'accepted') {
+        const {fare}=ride
+        const fineAmount=calcFine(fare)
+        sendMessage(ride.Captain.socketId, {
+            event: "accept-ride-cancel",
+            data: ride,
+          });    
+          return res.status(200).json({
+            message: "Accepted ride cancelled with a fine",
+            fine: fineAmount,
+        });    
+    }
+
+    return res.status(400).
+    json({ message: "Ride cannot be cancelled at this stage" });
+});

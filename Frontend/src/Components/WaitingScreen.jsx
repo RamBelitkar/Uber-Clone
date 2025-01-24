@@ -7,8 +7,33 @@ import VehicleDetails from './VehicleDetails';
 
 const WaitingScreen = ({ vehicle, onBack }) => {
   const { socket } = useContext(SocketContext);
-  const [rideDetails, setRideDetails] = useState(null); // State to hold ride details
+  const [acceptedRideDetails, setAcceptedRideDetails] = useState(null); // State to hold ride details
+  const [isCancelling, setIsCancelling] = useState(false); // State to track cancel request
+  const [rideDetails,setRideDetails]=useState('')
+  const cancelRide = async () => {
+    setIsCancelling(true);
+    try {
+      const token = localStorage.getItem('usertoken');
+      const response = await axios.put(
+        `${import.meta.env.VITE_BASE_URL}/ride/cancelRide`,
+        { rideId: rideDetails._id }, // Pass the ride/vehicle ID or necessary payload
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
+      if (response.status === 200) {
+        console.log('Ride cancelled successfully');
+        onBack(); // Navigate back or handle cancellation logic
+      }
+    } catch (error) {
+      console.error('Failed to cancel ride:', error);
+    } finally {
+      setIsCancelling(false);
+    }
+  };
   useEffect(() => {
     const createRide = async () => {
       try {
@@ -29,6 +54,8 @@ const WaitingScreen = ({ vehicle, onBack }) => {
 
         if (response.status === 200) {
           console.log('Ride is created and waiting for captain');
+          setRideDetails(response.data.newRidewithUser)
+          console.log(rideDetails);
         }
       } catch (error) {
         console.log(error);
@@ -37,7 +64,7 @@ const WaitingScreen = ({ vehicle, onBack }) => {
     };
 
     createRide();
-
+    console.log(rideDetails)
     
   }, [vehicle, onBack, socket]);
 
@@ -45,7 +72,7 @@ useEffect(() => {
   // Set up socket event listener
   socket.on('accept-ride', (data) => {
     console.log('Driver accepted', data);
-    setRideDetails(data); // Set the ride details to trigger VehicleDetails rendering
+    setAcceptedRideDetails(data); // Set the ride details to trigger VehicleDetails rendering
   });
   console.log(rideDetails)
 
@@ -55,8 +82,8 @@ useEffect(() => {
 }, [socket]);
 
   // Conditional rendering: show VehicleDetails if rideDetails is available
-  if (rideDetails) {
-    return <VehicleDetails vehicle={rideDetails} />;
+  if (acceptedRideDetails) {
+    return <VehicleDetails vehicle={acceptedRideDetails} />;
   }
 
   return (
@@ -78,6 +105,16 @@ useEffect(() => {
         We're finding the perfect {vehicle.name} for you.
       </p>
       <p className="text-gray-500 text-sm">This usually takes 1-3 minutes.</p>
+      
+      <button
+        onClick={cancelRide}
+        className={`px-6 py-2 text-white font-bold rounded-md ${
+          isCancelling ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'
+        }`}
+        disabled={isCancelling}
+      >
+        {isCancelling ? 'Cancelling...' : 'Cancel Ride'}
+      </button>
     </motion.div>
   );
 };

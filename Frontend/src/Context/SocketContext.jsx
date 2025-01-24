@@ -23,13 +23,6 @@ export const SocketProvider=({children})=>{
         // }
     },[])
 
-    // const sendMessage=(event,message)=>{
-    //     socket.on(event,message)
-    // }
-
-    // const recieveMessage=(event,callback)=>{
-    //     socket.emit(event,callback)
-    // }
 
 
     return(

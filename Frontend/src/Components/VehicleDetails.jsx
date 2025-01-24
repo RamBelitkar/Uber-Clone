@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect,useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, Star, Users, Clock,MapPin } from 'lucide-react';
 import axios from 'axios';
@@ -9,7 +9,8 @@ import { useNavigate } from 'react-router-dom';
 
 function VehicleDetails({ vehicle, onBack, onConfirm }) {
   const token = localStorage.getItem('usertoken');
- 
+  const [isCancelling, setIsCancelling] = useState(false)
+  const nav=useNavigate()
   const {socket}=useContext(SocketContext)
   const createRide = useCallback(async () => {
     try {
@@ -23,18 +24,46 @@ function VehicleDetails({ vehicle, onBack, onConfirm }) {
           },
         }
       );
-      console.log(response.data); // Handle the response as needed
+      // console.log(response.data); // Handle the response as needed
     } catch (error) {
       console.error(error);
     }
   }, [token, vehicle.name]);
+// console.log(vehicle);
+  //Cancel ride with fine
+  const cancelRide = useCallback(async () => {
+    if (!vehicle._id) {
+      console.error("No ride ID available")
+      return
+    }
+
+    setIsCancelling(true)
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_BASE_URL}/ride/cancelRide`,
+        { rideId: vehicle._id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      console.log("Ride cancelled:", response.data)
+       // Go back to the previous screen after cancelling
+      nav('/home')
+      } catch (error) {
+      console.error("Error cancelling ride:", error)
+    } finally {
+      setIsCancelling(false)
+    }
+  }, [token, vehicle._id, onBack])
 
   const handleConfirm = () => {
     createRide(); // Call the API when confirm is clicked
     onConfirm(vehicle); // Call the onConfirm function passed as prop
   };
   const captain=vehicle.Captain
-  const nav=useNavigate()
+  
 
   useEffect(()=>{
     socket.on('start-ride',()=>{
@@ -134,15 +163,26 @@ function VehicleDetails({ vehicle, onBack, onConfirm }) {
   </div>
 
   {/* Confirm Button */}
+  {/* Confirm and Cancel Buttons */}
   <div className="p-4 border-t bg-white">
-    <button 
-      className="w-full bg-black text-white p-4 rounded-lg text-lg font-semibold"
-      onClick={handleConfirm}
-      aria-label={`Confirm ${vehicle.name || 'Ride'}`}
-    >
-      Confirm {vehicle.name || 'Ride'}
-    </button>
-  </div>
+        <div className="flex space-x-4">
+          <button
+            className="flex-1 bg-red-500 text-white p-4 rounded-lg text-lg font-semibold disabled:opacity-50"
+            onClick={cancelRide}
+            disabled={isCancelling}
+            aria-label="Cancel Ride"
+          >
+            {isCancelling ? "Cancelling..." : "Cancel Ride"}
+          </button>
+          <button
+            className="flex-1 bg-black text-white p-4 rounded-lg text-lg font-semibold"
+            onClick={handleConfirm}
+            aria-label={`Confirm ${vehicle.name || "Ride"}`}
+          >
+            Confirm {vehicle.name || "Ride"}
+          </button>
+        </div>
+      </div>
 </motion.div>
 
   )}  

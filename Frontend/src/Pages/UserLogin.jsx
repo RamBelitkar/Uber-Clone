@@ -6,9 +6,6 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import axios from 'axios';
 import { UserDataContext } from '../Context/UserContext';
 
-
-
-
 function UserLogin() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -16,28 +13,47 @@ function UserLogin() {
     const nav=useNavigate()
       const {user,setUser}=useContext(UserDataContext)
 
-    const handleSubmit=async(e)=>{
-        e.preventDefault()
-       const existUser=({
-        email:email,
-        password:password
-       })
-        const res=await axios.post(`${import.meta.env.VITE_BASE_URL}/user/login`,existUser)
-        if(res.status===200){
-          const data=res.data
-          console.log(data.message);
-          localStorage.setItem('usertoken',data.token)
-          nav('/home')
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        const existUser = {
+          email: email,
+          password: password,
+        };
+      
+        try {
+          const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/login`, existUser);
+      
+          if (res.status === 200) {
+            const data = res.data;
+            console.log(data.message);
+            localStorage.setItem('usertoken', data.token);
+            nav('/home');
+          } 
+        } catch (err) {
+        
+            if (err.response) {
+              if (err.response.status === 400) {
+                setErrors(err.response.data.message || 'Invalid credentials. Please try again.');
+              } else {
+                setErrors(err.response.data.message || 'Something went wrong. Please try again later.');
+              }
+            } else {
+              setErrors('An unexpected error occurred. Please check your connection and try again.');
+            }
+          }
         }
-    }
-    
+      
+      
+        const [errors,setErrors]=useState('')
+
   return (
     <>
     <Header />
 <div className="min-h-screen flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 pt-4">
   <form className="max-w-sm w-full p-4 mt-4" onSubmit={handleSubmit}>
     <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3 text-center">Welcome Back!</h2>
-    
+    {errors && <p className="text-red-500 text-center mb-3">{errors}</p>}
     <div className="mb-3">
       <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
         Your email
