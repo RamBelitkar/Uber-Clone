@@ -114,7 +114,7 @@ export const getCapProfile=asyncHandler(async (req,res) => {
 
 
 export const logoutCap=asyncHandler(async (req,res) => {
-    const token=req.cookies.token || req.headers.authorization?.split(' ')[1]
+    const token=req.headers.authorization?.split(' ')[1] || req.cookies.token 
     const options={
         httpOnly:true,
         secure:true

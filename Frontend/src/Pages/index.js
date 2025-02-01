@@ -12,7 +12,11 @@ import CaptainProtected from "./CaptainProtected.jsx";
 import CaptainRiding from "./CaptainRiding.jsx";
 import UserRideStarted from "./UserRideStarted.jsx";
 import PaymentPage from "./PaymentPage.jsx";
+import Profile from "./Profile.jsx";
+import SosForm from "./SosForm.jsx";
 export {
+    Profile,
+    SosForm,
     PaymentPage,
     LandingPage,
     UserLogin,

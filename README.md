@@ -46,6 +46,51 @@ This repository contains the implementation of an Uber-like application built us
 - **Socket.io**: For real-time location updates.
 
 ---
+### Project Snippets
+
+### Landing Page
+<video controls src="./Frontend/Snippets/Landing Page.mp4" title="Title"></video>
+
+### User Login Page
+![alt text](./Frontend/Snippets/image.png)
+
+### Captain login Page
+![alt text](./Frontend/Snippets/image-2.png)
+
+### User Dashboard
+![alt text](./Frontend/Snippets/image-1.png)
+
+### Ride Options
+![alt text](./Frontend/Snippets/image-3.png)
+
+### Captain Popup For Ride
+![alt text](./Frontend/Snippets/image-4.png)
+
+### Captain otp for Starting Ride
+![alt text](./Frontend/Snippets/image-5.png)
+
+### Rider Details 
+![alt text](./Frontend/Snippets/image-6.png)
+
+### Captain Map
+![alt text](./Frontend/Snippets/image-7.png)
+
+### User Map
+![alt text](image-8.png)
+
+### User Payment With rating
+![alt text](./Frontend/Snippets/payment.png)
+
+### Sos Form for user
+![alt text](./Frontend/Snippets/sos-form.png)
+
+
+
+
+---
+
+
+
 
 ## Installation
 
@@ -145,6 +190,7 @@ uber-project/
 - **Live Tracking Page**
 - **Payment Page**
 
+
 ---
 
 ## License
@@ -161,4 +207,6 @@ Contributions are welcome! To contribute:
 2. Create a new branch.
 3. Make your changes.
 4. Submit a pull request.
+
+
 

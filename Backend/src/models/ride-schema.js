@@ -48,6 +48,15 @@ const rideSchema=new mongoose.Schema({
     otp:{
         type:String,
         required:true
+    },
+    policeAlert:{
+        reason:{
+            type:String
+        },
+        callMade: {
+            type: Boolean,
+            default: false // Default value can be false initially
+        }
     }
 },{timestamps:true})
 

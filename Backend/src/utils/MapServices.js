@@ -72,4 +72,3 @@ export async function getDistanceandTime(startAddress, endAddress) {
     return null;
   }
 };
-  

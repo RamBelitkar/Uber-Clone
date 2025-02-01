@@ -1,6 +1,6 @@
 import e from "express";
 import { body,query } from "express-validator";
-import { cancelRide, confirmRide, createRide, endRide, getFare, makePayment, seeRides, startRide } from "../controllers/ride-controller.js";
+import { cancelRide, confirmRide, createRide, endRide, getFare, getNearbyPolice, makePayment, seeRides, startRide } from "../controllers/ride-controller.js";
 import { authmiddlewareCap, authmiddlewareUser } from "../middleware/auth-middleware.js";
 
 const rideRoute=e.Router()
@@ -74,5 +74,22 @@ rideRoute.put('/cancelRide',
     ],
     cancelRide
 )
+
+rideRoute.post('/sendSos',
+    [
+        body('rideId').isMongoId().withMessage('Invalid Ride ID'),
+        body("latitude")
+        .isFloat({ min: -90, max: 90 }) // Latitude must be between -90 and 90
+        .withMessage("Latitude must be a valid number between -90 and 90"),
+      body("longitude")
+        .isFloat({ min: -180, max: 180 }) // Longitude must be between -180 and 180
+        .withMessage("Longitude must be a valid number between -180 and 180"),
+        body('reason').isString().isLength({min:3}),
+
+    ],
+    getNearbyPolice
+)
+
+
 
 export default rideRoute

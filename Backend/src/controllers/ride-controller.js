@@ -1,4 +1,6 @@
+import axios from "axios";
 import { CaptainModel } from "../models/captain-model.js";
+import { DeliveryModel } from "../models/delivery-model.js";
 import { RideModel } from "../models/ride-schema.js";
 import { asyncHandler } from "../utils/Asynchandler.js";
 import { sendMessage } from "../utils/GlobalSocket.js";
@@ -312,50 +314,6 @@ export const seeRides=asyncHandler(async (req,res) => {
 })
 // Rides can be fetched like cancelled rides completed rides
 
-
-
-// export const cancelPendingRides=asyncHandler(async (req,res) => {
-//   const validationErr=validationResult(req)
-  
-//   if(!validationErr.isEmpty()){
-//     return res.status(400)
-//     .json({
-//         error: validationErr.array()
-//     })
-//   }
-
-//   const {rideId}=req.body
-
-//   if(!rideId){
-//     throw new Error("Ride Id Missing")
-//   }
-//   const ride=await RideModel.findById({_id:rideId}).populate('Captain')
-
-//   if (ride.status !== "pending") {
-//     return res.status(400).json({
-//       message: "Only pending rides can be cancelled",
-//     });
-//   }
-
-//   // Cancel the ride
-//   await RideModel.findByIdAndUpdate({_id:rideId},{
-//     status:"cancelled"
-//   });
-  
-//   if (ride.Captain && ride.Captain.socketId) {
-//     sendMessage(ride.Captain.socketId, {
-//       event: "ride-cancel",
-//       data: ride,
-//     });
-//   }
-
-//   return res.status(200).json({
-//     message: "Ride cancelled successfully",
-//   });
-
-
-// })
-
 export const cancelRide = asyncHandler(async (req, res) => {
     const validationErr = validationResult(req);
     if (!validationErr.isEmpty()) {
@@ -409,3 +367,272 @@ export const cancelRide = asyncHandler(async (req, res) => {
     return res.status(400).
     json({ message: "Ride cannot be cancelled at this stage" });
 });
+
+
+export const createDelivery=asyncHandler(async (req,res) => {
+    const validationErr=validationResult(req)
+    if(!validationErr.isEmpty()){
+        return res.status(400).json({
+            error:validationErr.array()
+        })
+    }
+    const {
+        pickUp,
+        drop,
+        vehicleType
+    }=req.body
+    const user=req.user
+    if(!pickUp || !drop || !vehicleType){
+        throw new Error('Provide all information')
+    }
+  
+    const fareDetails = await DeliveryModel(pickUp, drop);
+    const { fares } = fareDetails; // Ensure fares is used (not fare directly)
+    const{ distanceInKm}=fareDetails 
+    const {durationInMins}=fareDetails
+    const otp=generateOtp(6)
+  
+  
+  
+    //FIrst getting the latitudes and longitudes from pickup 
+    const getPickup=await getLatLng(pickUp)
+   
+    const nearbyCaptains=await getNearbyCaptains(getPickup.latitude,getPickup.longitude,2)
+
+    const newRide = await DeliveryModel.create({
+        User: req.user._id,
+        pickup: pickUp,
+        destination: drop,
+        vehicleType,
+        duration:durationInMins,
+        distance:distanceInKm,
+        otp:otp,
+        fees: fares[vehicleType], // Note: Use `fares` instead of `fare` here
+    });
+    const newRidewithUser=await RideModel.findOne({_id:newRide._id}).populate('User')
+    newRide.otp=""
+    nearbyCaptains.map(captain=>
+        sendMessage(captain.socketId,{
+            event:'new-delivery',
+            data:newRidewithUser
+        })   
+    )
+    return res.status(200).json(
+        {
+            message:"Delivery Created",
+            newRidewithUser,
+            nearbyCaptains
+        }
+    )
+
+
+})
+
+
+export const startDelivery=asyncHandler(async (req,res) => {
+    const validationErr=validationResult(req)
+    if(!validationErr.isEmpty()){
+        return res.status(400)
+        .json({
+            error:validationErr.array()
+        })
+    }
+    const {deliveryId,otp}=req.body
+
+
+    if(!deliveryId || !otp){
+        res.status(404).
+        json({
+            message:'Body Data missing'
+        })
+    }
+
+    const delivery=await DeliveryModel.findOne({_id:rideId}).populate('User').populate('Captain')
+
+    if(!delivery){
+        throw new Error("Ride not found")
+    }
+    if(!delivery.otp===otp){
+        throw new Error("Error Otp invalid")
+    }
+
+    await DeliveryModel.findByIdAndUpdate({_id:rideId},{
+        status:'ongoing'
+    })
+
+      const user=delivery.User
+      sendMessage(user.socketId,{
+        event:'start-delivery',
+        data:ride
+      })
+
+      return res.status(200)
+      .json({
+        message:"Delivery Accepted and started",
+        delivery
+      })
+})
+
+export const endDelivery=asyncHandler(async (req,res) => {
+    const validationErr=validationResult(req)
+
+    if(!validationErr.isEmpty()){
+        res.status(400).
+        json({
+            error:validationErr.array()
+        })
+    }
+    const {deliveryId}=req.body
+
+    if(!deliveryId){
+        res.status(404).
+        json({
+            message:'Delivery id missing'
+        })
+    }
+    const delivery=await DeliveryModel.findOne({_id:deliveryId}).populate('User').populate('Captain')
+    if(!delivery){
+        res.status(400)
+        .json({
+            message:"Delivery Id not found"
+        })
+    }
+
+    if(delivery.status!=='ongoing'){
+    throw new Error('Ride not ongoing')
+    }
+
+    await DeliveryModel.findByIdAndUpdate({_id:rideId},{
+        status:'completed'
+    })
+
+    const user=delivery.User
+    sendMessage(delivey.User.socketId,{
+        event:'payment',
+        data:ride
+    })   
+
+    return res.status(200).json({
+        ride,
+        message:"Delivery Completed"
+    })
+
+})
+// export const makeDeliveryPayment=asyncHandler(async (req,res) => {
+//     const validationErr=validationResult(req)
+
+//     if(!validationErr.isEmpty()){
+//     return res.status(400).
+//         json({
+//             error:validationErr.array()
+//         })
+//     }
+//     const {rideId,fare,paymentType,rating}=req.body
+
+//     if(!rideId || !fare || !paymentType || !rating){
+//     return res.status(404).
+//         json({
+//             message:'Ride id missing or fare missing'
+//         })
+//     }
+//     const ride=await RideModel.findOne({_id:rideId}).populate('User').populate('Captain')
+//     if(!ride){
+//     return    res.status(400)
+//         .json({
+//             message:"Ride Id not found"
+//         })
+//     }
+//     const captain=ride.Captain
+//     await CaptainModel.findByIdAndUpdate({
+//         _id:captain._id
+//     },
+//     {rating:rating}
+//     )
+//     if(ride.status!=='completed'){
+//     throw new Error('Ride not completed')
+//     }
+
+//     if(ride.fare===fare)
+//     await RideModel.findByIdAndUpdate({_id:rideId},{
+//         status:'completed',
+//         paymentType:paymentType
+//     })
+
+//     return res.status(200).json({
+//         ride,
+//         message:"Delivery Completed and payment done"
+//     })
+
+// })
+
+
+export const getNearbyPolice=asyncHandler(async (req,res) => {
+    const validationErr=validationResult(req)
+
+    if(!validationErr.isEmpty()){
+    return res.status(400).
+        json({
+            error:validationErr.array()
+        })
+    }
+    const {rideId,latitude,longitude,reason}=req.body
+
+    if(!rideId  || !longitude || !latitude || !reason){
+    return res.status(404).
+        json({
+            message:'Ride id missing or Location missing missing'
+        })
+    }
+    console.log(rideId,latitude,longitude,reason);
+    const ride=await RideModel.findById({_id:rideId})
+    if(!ride){
+        return res.status(400)
+        .json({
+            message:"Ride Not Found"
+        })
+    }
+    if(ride.status!=="ongoing"){
+        return res.status(400)
+        .json({
+            message:"Ride Is not started"
+        }) 
+    }
+    await RideModel.findByIdAndUpdate({_id:rideId},{
+        policeAlert:{
+            reason:reason,
+            callMade:true
+        }
+    })
+    const key=process.env.GOMAPS_API_KEY
+    const response=await axios.get(`https://maps.gomaps.pro/maps/api/place/nearbysearch/json`,
+    {
+      params: {
+        keyword: "police",
+        location: `${latitude},${longitude}`,
+        radius: 15, // 1500 meters (Google Maps uses meters, not just '15')
+        key: key,
+      },
+    }
+  );        const data=response.data.results
+        // console.log(data);
+        const nearbyPoliceStation=data[0]
+        // console.log(nearbyPoliceStation);
+        if(data.length===0){
+            return res.status(404).
+            json({
+                message:"Sorry No nearby Police station"
+            })
+        }
+
+        sendMessage(ride.Captain.socketId,{
+            event:"police-alert",
+            data:nearbyPoliceStation
+        })
+        return res.status(200)
+        .json({
+            Reason:`${reason} has been duely noted`,
+            Message:`${nearbyPoliceStation.name} Has been notified`
+        })
+
+
+})

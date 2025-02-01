@@ -6,22 +6,12 @@ import { useContext } from 'react';
 import { CaptainContext, CaptainDataContext } from '../Context/CaptainContext';
 import { SocketContext } from '../Context/SocketContext';
 function CaptainHome() {
-    const mockRideRequests = [
-        { id: 1, pickup: "Central Park", dropoff: "Times Square", estimatedTime: 15, fare: 25, passengerName: "John Doe" },
-        { id: 2, pickup: "Brooklyn Bridge", dropoff: "Statue of Liberty", estimatedTime: 30, fare: 40, passengerName: "Jane Smith" },
-        { id: 3, pickup: "Empire State Building", dropoff: "Metropolitan Museum", estimatedTime: 20, fare: 30, passengerName: "Bob Johnson" },
-      ];
-    const [rideRequests, setRideRequests] = useState(mockRideRequests);
+   
     const [rides, setRides] = useState({});
-      const [acceptedRides,setAcceptedRides]=useState([])
-    const handleAcceptRide = (rideId) => {
-      const acceptedRide = rideRequests.find(ride => ride.id === rideId);
-      setAcceptedRides([...acceptedRides, acceptedRide]);
-      setRideRequests(rideRequests.filter(ride => ride.id !== rideId));
-    };
-const [location,setLocation]=useState()
-const {captain}=useContext(CaptainDataContext)
-const {socket}=useContext(SocketContext)
+    const [acceptedRides,setAcceptedRides]=useState([])
+    const [location,setLocation]=useState()
+    const {captain}=useContext(CaptainDataContext)
+    const {socket}=useContext(SocketContext)
 
 useEffect(()=>{
   // console.log('sending captian',`${captain}`)
@@ -47,7 +37,7 @@ const sendLocation=function()
 
 
 
-const locationDelay=setInterval(sendLocation,2000)//storing the delay in an variable so that unmounting can be easy
+const locationDelay=setInterval(sendLocation,1000)//storing the delay in an variable so that unmounting can be easy
 return()=>clearInterval(locationDelay)
 
 },[captain])
@@ -58,10 +48,23 @@ socket.on('new-ride',(data)=>{
   setRides(data)
 })
 
+const handleLogout = () => {
+  // Implement logout logic here
+  console.log("Logging out...")
+  // After logout, redirect to login page
+  router.push("/login")
+}
 
     return (
         <>
        <Header />
+       <button
+        onClick={handleLogout}
+        className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
+      >
+        Logout
+      </button>
+
       {rides && <DriverAcceptRide rideData={rides} />}
       <div className="p-4 max-w-3xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Available Ride Requests</h1>

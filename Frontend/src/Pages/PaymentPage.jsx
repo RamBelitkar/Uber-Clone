@@ -58,7 +58,7 @@ export default function PaymentPage(props) {
 
           {/* Driver Info */}
           <div className="mb-6">
-            <h2 className="text-xl font-semibold text-gray-700">Captain {captain?.fullname?.firstname}</h2>
+            <h2 className="text-xl font-semibold text-gray-700">Captain John {captain?.fullname?.firstname}</h2>
             <div className="flex items-center mt-2">
               {[...Array(5)].map((_, i) => (
                 <Star
@@ -75,11 +75,11 @@ export default function PaymentPage(props) {
           <div className="mb-6 space-y-3">
             <div className="flex items-center space-x-3 text-gray-600">
               <MapPin className="w-5 h-5" />
-              <span>{vehicle.destination || 'Loading pickup location...'}</span>
+              <span>RCM School, Ganesh Road, Phadke Haud, Kasba Peth, Pune, Maharashtra</span>
             </div>
             <div className="flex items-center space-x-3 text-gray-600">
               <Clock className="w-5 h-5" />
-              <span>{vehicle.duration} Min</span>
+              <span>25 Min</span>
             </div>
           </div>
 
@@ -125,7 +125,7 @@ export default function PaymentPage(props) {
             <span className="text-lg font-semibold">Total</span>   
             <div className="flex items-center space-x-2">
                   <IndianRupee  className="w-4 h-4 text-gray-600" />
-                  <span>{vehicle.fare}</span>
+                  {/* <span>{vehicle.fare}</span> */}
                 </div> 
           </div>
 

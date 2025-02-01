@@ -1,10 +1,13 @@
-import React, { useContext, useState,useEffect } from 'react';
-import { Search, Car, Bike, Truck, Clock, Gift, MapPin } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { VehicleDetails, LocationInput, RecentTrips, LookingForDriver,OffersSection } from '../Components';
-import { SocketContext } from '../Context/SocketContext';
-import { use } from 'react';
-import { UserContext, UserDataContext } from '../Context/UserContext';
+"use client";
+
+import { useContext, useState, useEffect } from "react";
+import { Search, MapPin, User, LogOut } from "lucide-react";
+import { motion } from "framer-motion";
+import { LocationInput, RecentTrips, LookingForDriver, OffersSection } from "../Components";
+import { SocketContext } from "../Context/SocketContext";
+import { UserDataContext } from "../Context/UserContext";
+import { useNavigate } from "react-router-dom";
+
 const RideTypeButton = ({ icon: Icon, label, onClick }) => (
   <button
     className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
@@ -15,20 +18,20 @@ const RideTypeButton = ({ icon: Icon, label, onClick }) => (
   </button>
 );
 
-
-
 export default function UserHomePage() {
-  const [pickup, setPickup] = useState('');
-  const [drop, setDrop] = useState('');
+  const [pickup, setPickup] = useState("");
+  const [drop, setDrop] = useState("");
   const [showDriverSearch, setShowDriverSearch] = useState(false);
-  const {socket}=useContext(SocketContext)
-  const {user}=useContext(UserDataContext)
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const { socket } = useContext(SocketContext);
+  const { user } = useContext(UserDataContext);
+  const nav=useNavigate()
+  useEffect(() => {
+    if (socket && user) {
+      socket.emit("join", { userId: user._id, role: "user" });
+    }
+  }, [user, socket]);
 
-
-  useEffect(()=>{
-    // console.log("in home page"+user);
-    socket.emit('join',{userId:user._id,role:'user'})
-  },[user])
   const handleBack = () => {
     if (showDriverSearch) {
       setShowDriverSearch(false);
@@ -43,10 +46,39 @@ export default function UserHomePage() {
     setDrop(value);
   };
 
+  const handleLogout = () => {
+    nav('/user/logout')
+    // Implement logout logic here
+    console.log("Logging out...");
+  };
+  const goProfile=()=>{
+    nav('/user/profile')
+  }
+  // console.log(user)
   return (
     <div className="min-h-screen bg-white">
       <header className="bg-black text-white p-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold">Welcome, John</h1>
+        <h1 className="text-xl font-bold">Welcome, {user?.fullname?.firstname}</h1>
+        <div className="relative">
+          <button
+            className="p-2 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors flex items-center"
+            onClick={() => setShowProfileMenu(!showProfileMenu)}
+          >
+            <User className="w-6 h-6 mr-2" />
+            <span onClick={goProfile}>Profile</span>
+          </button>
+          {showProfileMenu && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+              <button
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                onClick={handleLogout}
+              >
+                <LogOut className="w-4 h-4 inline-block mr-2" />
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </header>
 
       <main className="p-4 max-w-3xl mx-auto">
@@ -79,12 +111,19 @@ export default function UserHomePage() {
             </div>
 
             <RecentTrips />
-           
+
             <OffersSection />
+            
           </motion.div>
         )}
+          <div className="px-4 py-5 sm:px-6 border-t border-gray-200">
+            <button className="w-full sm:w-auto border border-gray-300 text-gray-700 font-bold py-2 px-4 rounded hover:bg-gray-100 transition duration-300"
+            onClick={handleLogout}
+            >
+              Logout
+            </button>
+            </div>
       </main>
     </div>
   );
 }
-

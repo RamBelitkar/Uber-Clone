@@ -6,8 +6,8 @@ import jwt from "jsonwebtoken";
 
 export const authmiddlewareUser=async (req,res,next) => {
     try {
-        const token=req.cookies.token || req.headers.authorization?.split(' ')[1]
-        if(!token){
+        const token= req.headers.authorization?.split(' ')[1] || req.cookies.token 
+         if(!token){
             return res.status(400).json({
                 message:"Token not found Unauthorized"
             })
@@ -41,7 +41,7 @@ export const authmiddlewareUser=async (req,res,next) => {
 
 export const authmiddlewareCap=async (req,res,next) => {
     try {
-        const token=req.cookies.token || req.headers.authorization.split(' ')[1]
+        const token=req.headers.authorization.split(' ')[1] || req.cookies.token 
     
         if(!token){
             return res.status(400)

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 // import './App.css';
-import { CapLogin, CapSignup,UserLogin, UserSignup,LandingPage, UserLogout, CaptainHome,CaptainLogout, UserHomePage, PaymentPage } from './Pages';
+import { CapLogin, CapSignup,UserLogin, UserSignup,LandingPage, UserLogout, CaptainHome,CaptainLogout, UserHomePage, PaymentPage, Profile, SosForm } from './Pages';
 // import { CaptainProtected,ProtectedWrapper } from './Pages';
 import { CaptainProtected,ProtectedWrapper,CaptainRiding } from './Pages';
 import UserRideStarted from './Pages/UserRideStarted';
@@ -28,6 +28,12 @@ function App() {
           <UserLogout/>
         </ProtectedWrapper>
         }/>
+       <Route path='/user/profile' element={
+        <ProtectedWrapper>
+          <Profile/>
+        </ProtectedWrapper>
+        }/>
+
         <Route path='/caphome' element={
           <CaptainProtected>
             <CaptainHome/>
@@ -46,6 +52,12 @@ function App() {
         <Route path='/rideStarted' element={
            <ProtectedWrapper>
            <UserRideStarted/>
+          </ProtectedWrapper>
+        }/>
+       
+        <Route path='/sos' element={
+           <ProtectedWrapper>
+           <SosForm/>
           </ProtectedWrapper>
         }/>
        
